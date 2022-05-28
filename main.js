@@ -12,7 +12,6 @@ import skyTextureURL from '/images/textures/2k_stars.jpg';
 import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
 import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
 import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
-//import earthNormalMapURL from '/images/textures/2k_earth_normal_map.png'
 import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
 import cloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
 import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
@@ -220,11 +219,9 @@ const venusCOPSpherical = new THREE.Spherical();
 
 // Earth
 const earthTexture = new THREE.TextureLoader().load(earthTextureURL);
-//const earthNormalMap = new THREE.TextureLoader().load(earthNormalMapURL);
 const earthSpecularMap = new THREE.TextureLoader().load(earthSpecularMapURL);
 const earthMaterial = new THREE.MeshPhongMaterial({
   map: earthTexture,
-  //normalMap: earthNormalMap,
   specularMap: earthSpecularMap
 });
 const earthGeometry = new THREE.SphereBufferGeometry(earthRadius, sphereSegmentsHor, sphereSegmentsVer);
