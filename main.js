@@ -14,6 +14,7 @@ import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
 import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
 import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
 import cloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
+import moonTextureURL from '/images/textures/2k_moon-optimized.jpg';
 import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
 import jupiterTextureURL from '/images/textures/2k_jupiter-optimized.jpg';
 import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
@@ -61,6 +62,7 @@ const sunRadius = 1;
 const mercuryRadius = 0.0035;
 const venusRadius = 0.0087;
 const earthRadius = 0.0091;
+const moonRadius = 0.0025;
 const marsRadius = 0.0049;
 const jupiterRadius = 0.1004;
 const saturnRadius = 0.0836;
@@ -70,6 +72,7 @@ const neptuneRadius = 0.0354;
 const mercurySunDist = 49 / 10;
 const venusSunDist = 80 / 10;
 const earthSunDist = 110 / 10;
+const moonEarthDist = 0.5637 / 10;
 const marsSunDist = 150 / 10;
 const jupiterSunDist = 535 / 10;
 const saturnSunDist = 1060 / 10;
@@ -193,7 +196,7 @@ const sunCOPSpherical = new THREE.Spherical();
 
 // Mercury
 const mercuryTexture = new THREE.TextureLoader().load(mercuryTextureURL);
-const mercuryMaterial = new THREE.MeshPhongMaterial({ map: mercuryTexture });
+const mercuryMaterial = new THREE.MeshPhongMaterial({ map: mercuryTexture, shininess: 0 });
 const mercuryGeometry = new THREE.SphereBufferGeometry(mercuryRadius, sphereSegmentsHor, sphereSegmentsVer);
 const mercuryMesh = new THREE.Mesh(mercuryGeometry, mercuryMaterial);
 const mercurySpherical = new THREE.Spherical(mercurySunDist, PI / 2, - PI / 300);
@@ -206,7 +209,7 @@ const mercuryCOPSpherical = new THREE.Spherical();
 
 // Venus
 const venusTexture = new THREE.TextureLoader().load(venusTextureURL);
-const venusMaterial = new THREE.MeshPhongMaterial({ map: venusTexture });
+const venusMaterial = new THREE.MeshPhongMaterial({ map: venusTexture, shininess: 0 });
 const venusGeometry = new THREE.SphereBufferGeometry(venusRadius, sphereSegmentsHor, sphereSegmentsVer);
 const venusMesh = new THREE.Mesh(venusGeometry, venusMaterial);
 const venusSpherical = new THREE.Spherical(venusSunDist, PI / 2, PI / 4);
@@ -245,12 +248,22 @@ const earthCPP = new THREE.Vector3();
 const earthCPPOffset = new THREE.Vector3().setFromSphericalCoords(earthRadius, PI / 2, earthSpherical.theta + PI / 2);
 const earthCOPSpherical = new THREE.Spherical(0.03, PI / 2.1, PI * 0.8);
 
+// The Moon
+const moonTexture = new THREE.TextureLoader().load(moonTextureURL);
+const moonMaterial = new THREE.MeshPhongMaterial({ map: moonTexture, shininess: 0 });
+const moonGeometry = new THREE.SphereBufferGeometry(moonRadius, sphereSegmentsHor, sphereSegmentsVer);
+const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
+const moonSpherical = new THREE.Spherical(moonEarthDist, PI / 2, 0);
+moonMesh.position.setFromSpherical(moonSpherical);
+moonMesh.rotation.y = PI / 2;
+earthMesh.add(moonMesh);
+
 // Mars
 const marsTexture = new THREE.TextureLoader().load(marsTextureURL);
-const marsMaterial = new THREE.MeshPhongMaterial({ map: marsTexture });
+const marsMaterial = new THREE.MeshPhongMaterial({ map: marsTexture, shininess: 0 });
 const marsGeometry = new THREE.SphereBufferGeometry(marsRadius, sphereSegmentsHor, sphereSegmentsVer);
 const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
-const marsSpherical = new THREE.Spherical(marsSunDist, PI / 2, 3 * PI / 4);
+const marsSpherical = new THREE.Spherical(marsSunDist, PI / 2, PI / 2);
 marsMesh.position.setFromSpherical(marsSpherical);
 scene.add(marsMesh);
 
@@ -260,7 +273,7 @@ const marsCOPSpherical = new THREE.Spherical();
 
 // Jupiter
 const jupiterTexture = new THREE.TextureLoader().load(jupiterTextureURL);
-const jupiterMaterial = new THREE.MeshPhongMaterial({ map: jupiterTexture });
+const jupiterMaterial = new THREE.MeshPhongMaterial({ map: jupiterTexture, shininess: 0 });
 const jupiterGeometry = new THREE.SphereBufferGeometry(jupiterRadius, sphereSegmentsHor, sphereSegmentsVer);
 const jupiterMesh = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
 const jupiterSpherical = new THREE.Spherical(jupiterSunDist, PI / 2, - PI / 4);
@@ -273,7 +286,7 @@ const jupiterCOPSpherical = new THREE.Spherical();
 
 // Saturn
 const saturnTexture = new THREE.TextureLoader().load(saturnTextureURL);
-const saturnMaterial = new THREE.MeshPhongMaterial({ map: saturnTexture });
+const saturnMaterial = new THREE.MeshPhongMaterial({ map: saturnTexture, shininess: 0 });
 const saturnGeometry = new THREE.SphereBufferGeometry(saturnRadius, sphereSegmentsHor, sphereSegmentsVer);
 const saturnMesh = new THREE.Mesh(saturnGeometry, saturnMaterial);
 const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - 3 * PI / 4);
@@ -286,7 +299,7 @@ const saturnCOPSpherical = new THREE.Spherical();
 
 // Uranus
 const uranusTexture = new THREE.TextureLoader().load(uranusTextureURL);
-const uranusMaterial = new THREE.MeshPhongMaterial({ map: uranusTexture });
+const uranusMaterial = new THREE.MeshPhongMaterial({ map: uranusTexture, shininess: 0 });
 const uranusGeometry = new THREE.SphereBufferGeometry(uranusRadius, sphereSegmentsHor, sphereSegmentsVer);
 const uranusMesh = new THREE.Mesh(uranusGeometry, uranusMaterial);
 const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, PI);
@@ -299,7 +312,7 @@ const uranusCOPSpherical = new THREE.Spherical();
 
 // Neptune
 const neptuneTexture = new THREE.TextureLoader().load(neptuneTextureURL);
-const neptuneMaterial = new THREE.MeshPhongMaterial({ map: neptuneTexture });
+const neptuneMaterial = new THREE.MeshPhongMaterial({ map: neptuneTexture, shininess: 0 });
 const neptuneGeometry = new THREE.SphereBufferGeometry(neptuneRadius, sphereSegmentsHor, sphereSegmentsVer);
 const neptuneMesh = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
 const neptuneSpherical = new THREE.Spherical(neptuneSunDist, PI / 2, - PI / 2);
@@ -381,9 +394,11 @@ const welcomeSection = document.querySelector('#welcome');
 const mercurySection = document.querySelector('#mercury');
 const venusSection = document.querySelector('#venus');
 const earthSection = document.querySelector('#earth');
+const marsSection = document.querySelector('#mars');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
+const toMarsSection = document.querySelector('#toMarsSection');
 
 function moveCamera() {
 
@@ -523,6 +538,50 @@ function moveCamera() {
     );
   }
 
+  // to Mars animation
+  start = (window.pageYOffset + earthSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  end = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  if (start < s && s <= end) {
+    const interval = end - start;
+    cameraPivotPoint.set(
+      earthCPP.x + (marsCPP.x - earthCPP.x) * easeInOutQuint((s - start) / interval),
+      earthCPP.y + (marsCPP.y - earthCPP.y) * easeInOutQuint((s - start) / interval),
+      earthCPP.z + (marsCPP.z - earthCPP.z) * easeInOutQuint((s - start) / interval)
+    );
+    if (start < s && s <= start + interval / 2) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        earthCOPSpherical.radius + 10 * easeInOutQuint((s - start) / interval),
+        earthCOPSpherical.phi + (marsCOPSpherical.phi - earthCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        earthCOPSpherical.theta + (marsCOPSpherical.theta - earthCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    if (start + interval / 2 < s && s <= end) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        (earthCOPSpherical.radius + 10) + marsCOPSpherical.radius - (earthCOPSpherical.radius + 10) * easeInOutQuint((s - start) / interval),
+        earthCOPSpherical.phi + (marsCOPSpherical.phi - earthCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        earthCOPSpherical.theta + (marsCOPSpherical.theta - earthCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // Mars shot
+  start = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  end = (window.pageYOffset + marsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  if (start < s && s <= end) {
+    cameraPivotPoint.set(...marsCPP);
+    cameraOrbitPosition.setFromSpherical(marsCOPSpherical);
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
 }
 
 
@@ -546,7 +605,7 @@ function mobileMediaChange(mediaQuery) {
     mercuryCOPSpherical.set(mercuryRadius * 6, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 6, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
-    marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 0.8);
+    marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.8);
     saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 0.8);
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
@@ -601,7 +660,7 @@ function mobileMediaChange(mediaQuery) {
     mercuryCOPSpherical.set(mercuryRadius * 3, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 3, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 3, PI / 2.1, PI * 0.8);
-    marsCOPSpherical.set(marsRadius * 3, PI / 2.1, PI * 0.8);
+    marsCOPSpherical.set(marsRadius * 3, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 3, PI / 2.1, PI * 0.8);
     saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 0.8);
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0.8);
