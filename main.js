@@ -601,15 +601,15 @@ function mobileMediaChange(mediaQuery) {
     uranusCPP.set(...uranusMesh.position);
     neptuneCPP.set(...neptuneMesh.position);
 
-    sunCOPSpherical.set(sunRadius * 7, PI / 2.001, 0);
-    mercuryCOPSpherical.set(mercuryRadius * 6, PI / 2.1, PI * 0.8);
-    venusCOPSpherical.set(venusRadius * 6, PI / 2.1, PI * 1.4);
-    earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
-    marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 1.7);
-    jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.8);
-    saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 0.8);
-    uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
-    neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.8);
+    sunCOPSpherical.set(sunRadius * 3000 / window.innerWidth, PI / 2.001, 0);
+    mercuryCOPSpherical.set(mercuryRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
+    venusCOPSpherical.set(venusRadius * 2700 / window.innerWidth, PI / 2.1, PI * 1.4);
+    earthCOPSpherical.set(earthRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
+    marsCOPSpherical.set(marsRadius * 2700 / window.innerWidth, PI / 2.1, PI * 1.7);
+    jupiterCOPSpherical.set(jupiterRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
+    saturnCOPSpherical.set(saturnRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
+    uranusCOPSpherical.set(uranusRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
+    neptuneCOPSpherical.set(neptuneRadius * 2700 / window.innerWidth, PI / 2.1, PI * 0.8);
 
     moveCamera();
     document.body.onscroll = moveCamera;
