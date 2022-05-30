@@ -1,7 +1,18 @@
 ::-webkit-scrollbar {
-  display: none;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  width: 0.5em;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb {
+  background: gray;
+  border-radius: 1em;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: white;
 }
 
 * {
@@ -16,6 +27,7 @@ html {
 
 body {
   background-color: #000000;
+  overflow: overlay;
 }
 
 header {
@@ -39,8 +51,12 @@ a {
   transition: all 0.2s ease;
 }
 
-.nav-item a:hover {
+.nav-item a {
   color: gray;
+}
+
+.nav-item a:hover {
+  color: white;
 }
 
 img {

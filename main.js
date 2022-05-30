@@ -25,9 +25,6 @@ import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
 
 // INIT //
 
-const PI = Math.PI;
-const sin = Math.sin;
-const cos = Math.cos;
 const easeInOutSine = function (x) {
   return -(cos(PI * x) - 1) / 2;
 }
@@ -54,9 +51,9 @@ function easeInOutCirc(x) {
     ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
     : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
 }
-
-let sphereSegmentsHor = 64;
-let sphereSegmentsVer = sphereSegmentsHor / 2;
+const PI = Math.PI;
+const sin = Math.sin;
+const cos = Math.cos;
 
 const sunRadius = 1;
 const mercuryRadius = 0.0035;
@@ -79,10 +76,12 @@ const saturnSunDist = 1060 / 10;
 const uranusSunDist = 2115 / 10;
 const neptuneSunDist = 3215 / 10;
 
-let time = 0;
-let isPlaying = true;
-
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
+
+const clock = new THREE.Clock();
+
+let sphereSegmentsHor;
+let sphereSegmentsVer;
 if (mobile.matches) {
   sphereSegmentsHor = 32;
   sphereSegmentsVer = sphereSegmentsHor / 2;
@@ -126,7 +125,7 @@ const cameraPivotPoint = new THREE.Vector3(); // CPP
 cameraPivotPoint.setFromSphericalCoords(0, PI / 2, 0);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 1000);
-const cameraOrbitPosition = new THREE.Vector3();
+const cameraOrbitPosition = new THREE.Vector3(); // COP
 cameraOrbitPosition.setFromSphericalCoords(5, PI / 2.001, 0);
 camera.position.set(
   cameraPivotPoint.x + cameraOrbitPosition.x,
@@ -136,12 +135,11 @@ camera.position.set(
 
 const scene = new THREE.Scene();
 
+// light
 const sunLight = new THREE.PointLight(0xffffff, 1);
 scene.add(sunLight);
 
-/* const ambientLight = new THREE.AmbientLight(0xffffff, 0.02);
-scene.add(ambientLight); */
-
+// background stars
 const skyTexture = new THREE.TextureLoader().load(skyTextureURL);
 const skyMaterial = new THREE.MeshBasicMaterial({
   map: skyTexture,
@@ -276,7 +274,7 @@ const jupiterTexture = new THREE.TextureLoader().load(jupiterTextureURL);
 const jupiterMaterial = new THREE.MeshPhongMaterial({ map: jupiterTexture, shininess: 0 });
 const jupiterGeometry = new THREE.SphereBufferGeometry(jupiterRadius, sphereSegmentsHor, sphereSegmentsVer);
 const jupiterMesh = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
-const jupiterSpherical = new THREE.Spherical(jupiterSunDist, PI / 2, - PI / 4);
+const jupiterSpherical = new THREE.Spherical(jupiterSunDist, PI / 2, - PI / 2);
 jupiterMesh.position.setFromSpherical(jupiterSpherical);
 scene.add(jupiterMesh);
 
@@ -289,7 +287,7 @@ const saturnTexture = new THREE.TextureLoader().load(saturnTextureURL);
 const saturnMaterial = new THREE.MeshPhongMaterial({ map: saturnTexture, shininess: 0 });
 const saturnGeometry = new THREE.SphereBufferGeometry(saturnRadius, sphereSegmentsHor, sphereSegmentsVer);
 const saturnMesh = new THREE.Mesh(saturnGeometry, saturnMaterial);
-const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - 3 * PI / 4);
+const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - PI / 4);
 saturnMesh.position.setFromSpherical(saturnSpherical);
 scene.add(saturnMesh);
 
@@ -302,7 +300,7 @@ const uranusTexture = new THREE.TextureLoader().load(uranusTextureURL);
 const uranusMaterial = new THREE.MeshPhongMaterial({ map: uranusTexture, shininess: 0 });
 const uranusGeometry = new THREE.SphereBufferGeometry(uranusRadius, sphereSegmentsHor, sphereSegmentsVer);
 const uranusMesh = new THREE.Mesh(uranusGeometry, uranusMaterial);
-const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, PI);
+const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, - 3 * PI / 4);
 uranusMesh.position.setFromSpherical(uranusSpherical);
 scene.add(uranusMesh);
 
@@ -315,7 +313,7 @@ const neptuneTexture = new THREE.TextureLoader().load(neptuneTextureURL);
 const neptuneMaterial = new THREE.MeshPhongMaterial({ map: neptuneTexture, shininess: 0 });
 const neptuneGeometry = new THREE.SphereBufferGeometry(neptuneRadius, sphereSegmentsHor, sphereSegmentsVer);
 const neptuneMesh = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
-const neptuneSpherical = new THREE.Spherical(neptuneSunDist, PI / 2, - PI / 2);
+const neptuneSpherical = new THREE.Spherical(neptuneSunDist, PI / 2, PI);
 neptuneMesh.position.setFromSpherical(neptuneSpherical);
 scene.add(neptuneMesh);
 
@@ -325,6 +323,7 @@ const neptuneCOPSpherical = new THREE.Spherical();
 
 
 
+// Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -335,50 +334,43 @@ document.body.appendChild(renderer.domElement);
 
 
 
+// helpers
 /* const gridHelper = new THREE.GridHelper(10, 50);
 scene.add(gridHelper); */
 
 
 
 // controls
-
 const controls = new OrbitControls(camera, renderer.domElement);
 /* controls.enabled = false;
 controls.autoRotate = false;
 controls.autoRotateSpeed = -0.5; */
 
 
-/* cameraPivotPoint.set(...earthCPP);
-cameraOrbitPosition.setFromSphericalCoords(0.03, PI / 2.1, PI * 0.8);
-camera.position.set(
-  cameraPivotPoint.x + cameraOrbitPosition.x,
-  cameraPivotPoint.y + cameraOrbitPosition.y,
-  cameraPivotPoint.z + cameraOrbitPosition.z
-); */
 
 // ANIMATION //
 
 function animation() {
 
-  time += 0.05;
+  const timeDelta = clock.getDelta();
 
   cubeCamera.update(renderer, offScene);
-  perlinMaterial.uniforms.time.value = time;
-  sunMaterial.uniforms.time.value = time;
+  perlinMaterial.uniforms.time.value = clock.elapsedTime;
+  sunMaterial.uniforms.time.value = clock.elapsedTime;
   sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture;
 
-  skyMesh.rotation.y -= PI / 5000;
+  skyMesh.rotateY(- timeDelta * 0.02);
 
   coronaMesh.lookAt(camera.position);
 
-  mercuryMesh.rotation.y += PI / 1000;
-  venusMesh.rotation.y += PI / 1000;
-  earthMesh.rotation.y += PI / 1000;
-  marsMesh.rotation.y += PI / 1000;
-  jupiterMesh.rotation.y += PI / 1000;
-  saturnMesh.rotation.y += PI / 1000;
-  uranusMesh.rotation.y += PI / 1000;
-  neptuneMesh.rotation.y += PI / 1000;
+  mercuryMesh.rotateY(timeDelta * 0.1);
+  venusMesh.rotateY(timeDelta * 0.1);
+  earthMesh.rotateY(timeDelta * 0.1);
+  marsMesh.rotateY(timeDelta * 0.1);
+  jupiterMesh.rotateY(timeDelta * 0.1);
+  saturnMesh.rotateY(timeDelta * 0.1);
+  uranusMesh.rotateY(timeDelta * 0.1);
+  neptuneMesh.rotateY(timeDelta * 0.1);
 
   controls.target.set(...cameraPivotPoint);
   controls.update();
@@ -395,10 +387,12 @@ const mercurySection = document.querySelector('#mercury');
 const venusSection = document.querySelector('#venus');
 const earthSection = document.querySelector('#earth');
 const marsSection = document.querySelector('#mars');
+const jupiterSection = document.querySelector('#jupiter');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
 const toMarsSection = document.querySelector('#toMarsSection');
+const toJupiterSection = document.querySelector('#toJupiterSection');
 
 function moveCamera() {
 
@@ -582,6 +576,50 @@ function moveCamera() {
     );
   }
 
+  // to Jupiter animation
+  start = (window.pageYOffset + marsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  end = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  if (start < s && s <= end) {
+    const interval = end - start;
+    cameraPivotPoint.set(
+      marsCPP.x + (jupiterCPP.x - marsCPP.x) * easeInOutQuint((s - start) / interval),
+      marsCPP.y + (jupiterCPP.y - marsCPP.y) * easeInOutQuint((s - start) / interval),
+      marsCPP.z + (jupiterCPP.z - marsCPP.z) * easeInOutQuint((s - start) / interval)
+    );
+    if (start < s && s <= start + interval / 2) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        marsCOPSpherical.radius + 100 * easeInOutQuint((s - start) / interval),
+        marsCOPSpherical.phi + (jupiterCOPSpherical.phi - marsCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        marsCOPSpherical.theta + (jupiterCOPSpherical.theta - marsCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    if (start + interval / 2 < s && s <= end) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        (marsCOPSpherical.radius + 100) + jupiterCOPSpherical.radius - (marsCOPSpherical.radius + 100) * easeInOutQuint((s - start) / interval),
+        marsCOPSpherical.phi + (jupiterCOPSpherical.phi - marsCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        marsCOPSpherical.theta + (jupiterCOPSpherical.theta - marsCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // Jupiter shot
+  start = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  end = (window.pageYOffset + jupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  if (start < s && s <= end) {
+    cameraPivotPoint.set(...jupiterCPP);
+    cameraOrbitPosition.setFromSpherical(jupiterCOPSpherical);
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
 }
 
 
@@ -591,6 +629,7 @@ function moveCamera() {
 function mobileMediaChange(mediaQuery) {
 
   if (mediaQuery.matches) {
+
     // If media query matches
     mercuryCPP.set(...mercuryMesh.position);
     venusCPP.set(...venusMesh.position);
@@ -606,14 +645,16 @@ function mobileMediaChange(mediaQuery) {
     venusCOPSpherical.set(venusRadius * 6, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
     marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 1.7);
-    jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.8);
+    jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.4);
     saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 0.8);
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.8);
 
     moveCamera();
     document.body.onscroll = moveCamera;
+
   } else {
+
     // If media query doesn't match
     mercuryCPP.set(
       mercuryMesh.position.x + mercuryCPPOffset.x,
@@ -661,13 +702,14 @@ function mobileMediaChange(mediaQuery) {
     venusCOPSpherical.set(venusRadius * 3, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 3, PI / 2.1, PI * 0.8);
     marsCOPSpherical.set(marsRadius * 3, PI / 2.1, PI * 1.7);
-    jupiterCOPSpherical.set(jupiterRadius * 3, PI / 2.1, PI * 0.8);
+    jupiterCOPSpherical.set(jupiterRadius * 3, PI / 2.1, PI * 0.4);
     saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 0.8);
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.8);
 
     moveCamera();
     document.body.onscroll = moveCamera;
+
   }
 
 }
