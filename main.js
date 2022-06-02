@@ -33,12 +33,16 @@ const earthSection = document.querySelector('#earth');
 const marsSection = document.querySelector('#mars');
 const jupiterSection = document.querySelector('#jupiter');
 const saturnSection = document.querySelector('#saturn');
+const uranusSection = document.querySelector('#uranus');
+const neptuneSection = document.querySelector('#neptune');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
 const toMarsSection = document.querySelector('#toMarsSection');
 const toJupiterSection = document.querySelector('#toJupiterSection');
 const toSaturnSection = document.querySelector('#toSaturnSection');
+const toUranusSection = document.querySelector('#toUranusSection');
+const toNeptuneSection = document.querySelector('#toNeptuneSection');
 
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -347,6 +351,8 @@ const uranusGeometry = new THREE.SphereBufferGeometry(uranusRadius, sphereSegmen
 const uranusMesh = new THREE.Mesh(uranusGeometry, uranusMaterial);
 const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, - 3 * PI / 4);
 uranusMesh.position.setFromSpherical(uranusSpherical);
+uranusMesh.rotation.z = - PI / 2;
+uranusMesh.rotation.y = - PI / 4;
 scene.add(uranusMesh);
 
 const uranusCPP = new THREE.Vector3();
@@ -418,7 +424,7 @@ function mobileMediaChange(mediaQuery) {
     marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.3);
     saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 1);
-    uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
+    uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0);
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.8);
 
     window.addEventListener('scroll', moveCamera);
@@ -475,7 +481,7 @@ function mobileMediaChange(mediaQuery) {
     marsCOPSpherical.set(marsRadius * 3, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 3, PI / 2.1, PI * 0.3);
     saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 1);
-    uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0.8);
+    uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0);
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.8);
 
     window.addEventListener('scroll', moveCamera);
@@ -509,7 +515,7 @@ function animation() {
   marsMesh.rotateY(timeDelta * 0.1);
   jupiterMesh.rotateY(timeDelta * 0.1);
   saturnMesh.rotateY(timeDelta * 0.1);
-  uranusMesh.rotateY(timeDelta * 0.1);
+  uranusMesh.rotateY(timeDelta * (- 0.1));
   neptuneMesh.rotateY(timeDelta * 0.1);
 
   controls.target.set(...cameraPivotPoint);
@@ -787,6 +793,50 @@ function moveCamera() {
   if (start < s && s <= end) {
     cameraPivotPoint.set(...saturnCPP);
     cameraOrbitPosition.setFromSpherical(saturnCOPSpherical);
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // To Uranus animation
+  start = (window.pageYOffset + saturnSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toUranusSection.getBoundingClientRect().bottom) - window.innerHeight;
+  if (start < s && s <= end) {
+    const interval = end - start;
+    cameraPivotPoint.set(
+      saturnCPP.x + (uranusCPP.x - saturnCPP.x) * easeInOutQuint((s - start) / interval),
+      saturnCPP.y + (uranusCPP.y - saturnCPP.y) * easeInOutQuint((s - start) / interval),
+      saturnCPP.z + (uranusCPP.z - saturnCPP.z) * easeInOutQuint((s - start) / interval)
+    );
+    if (start < s && s <= start + interval / 2) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        saturnCOPSpherical.radius + 100 * easeInOutQuint((s - start) / interval),
+        saturnCOPSpherical.phi + (uranusCOPSpherical.phi - saturnCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        saturnCOPSpherical.theta + (uranusCOPSpherical.theta - saturnCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    if (start + interval / 2 < s && s <= end) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        (saturnCOPSpherical.radius + 100) + uranusCOPSpherical.radius - (saturnCOPSpherical.radius + 100) * easeInOutQuint((s - start) / interval),
+        saturnCOPSpherical.phi + (uranusCOPSpherical.phi - saturnCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        saturnCOPSpherical.theta + (uranusCOPSpherical.theta - saturnCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // Uranus shot
+  start = (window.pageYOffset + toUranusSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + uranusSection.getBoundingClientRect().bottom);
+  if (start < s && s <= end) {
+    cameraPivotPoint.set(...uranusCPP);
+    cameraOrbitPosition.setFromSpherical(uranusCOPSpherical);
     camera.position.set(
       cameraPivotPoint.x + cameraOrbitPosition.x,
       cameraPivotPoint.y + cameraOrbitPosition.y,
