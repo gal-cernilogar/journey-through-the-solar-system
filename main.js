@@ -8,18 +8,18 @@ import sunFragment from '/shaders/sunShader/fragment.glsl';
 import coronaFragment from '/shaders/coronaShader/fragment.glsl';
 import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
-// import starsTextureURL from '/images/textures/2k_stars.jpg';
-import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
-import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
-import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
-import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
-import cloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
-import moonTextureURL from '/images/textures/2k_moon-optimized.jpg';
-import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
-import jupiterTextureURL from '/images/textures/2k_jupiter-optimized.jpg';
-import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
-import uranusTextureURL from '/images/textures/2k_uranus-optimized.jpg';
-import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
+import starsTextureURL from '/images/textures/2k_stars.jpg';
+import mercuryTextureURL from '/images/textures/2k_mercury.jpg';
+import venusTextureURL from '/images/textures/2k_venus_surface.jpg';
+import earthTextureURL from '/images/textures/2k_earth_daymap.jpg';
+import earthSpecularMapURL from '/images/textures/2k_earth_specular_map.png';
+import cloudsTextureURL from '/images/textures/2k_earth_clouds.jpg';
+import moonTextureURL from '/images/textures/2k_moon.jpg';
+import marsTextureURL from '/images/textures/2k_mars.jpg';
+import jupiterTextureURL from '/images/textures/2k_jupiter.jpg';
+import saturnTextureURL from '/images/textures/2k_saturn.jpg';
+import uranusTextureURL from '/images/textures/2k_uranus.jpg';
+import neptuneTextureURL from '/images/textures/2k_neptune.jpg';
 
 
 
@@ -154,16 +154,16 @@ const sunLight = new THREE.PointLight(0xffffff, 1);
 scene.add(sunLight);
 
 // Stars
-/* const starsTexture = new THREE.TextureLoader().load(starsTextureURL);
+const starsTexture = new THREE.TextureLoader().load(starsTextureURL);
 const starsMaterial = new THREE.MeshBasicMaterial({
   map: starsTexture,
   side: THREE.BackSide
 });
 const starsGeometry = new THREE.BoxBufferGeometry(1000, 500, 1000);
 const starsMesh = new THREE.Mesh(starsGeometry, starsMaterial);
-scene.add(starsMesh); */
+scene.add(starsMesh);
 
-const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
+/* const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 const starsGeometry = new THREE.BufferGeometry();
 
 createStars();
@@ -172,9 +172,9 @@ function createStars() {
   const starCartesian = new THREE.Vector3();
   const starPositions = [];
 
-  for (let i = 0; i < 10000; i++) {
+  for (let i = 0; i < 50000; i++) {
     starSpherical.set(
-      random() * 500 + 500,
+      random() * 1000 + 500,
       acos((random() * 2) - 1),
       random() * 2 * PI
     )
@@ -185,7 +185,7 @@ function createStars() {
 }
 
 const stars = new THREE.Points(starsGeometry, starsMaterial);
-scene.add(stars);
+scene.add(stars); */
 
 // The Sun
 const coronaMaterial = new THREE.ShaderMaterial({
@@ -364,8 +364,7 @@ document.body.appendChild(renderer.domElement);
 
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
-/* controls.enabled = false;
-controls.autoRotate = false;
+/* controls.autoRotate = false;
 controls.autoRotateSpeed = -0.5; */
 
 
@@ -399,9 +398,8 @@ function mobileMediaChange(mediaQuery) {
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.8);
 
+    window.addEventListener('scroll', moveCamera);
     moveCamera();
-    document.body.onscroll = moveCamera;
-
   } else {
 
     // If media query doesn't match
@@ -457,8 +455,8 @@ function mobileMediaChange(mediaQuery) {
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.8);
 
+    window.addEventListener('scroll', moveCamera);
     moveCamera();
-    document.body.onscroll = moveCamera;
 
   }
 
@@ -477,7 +475,8 @@ function animation() {
   sunMaterial.uniforms.time.value = clock.elapsedTime;
   sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture;
 
-  stars.rotateY(- timeDelta * 0.02);
+  starsMesh.rotateY(- timeDelta * 0.02);
+  // stars.rotateY(- timeDelta * 0.02);
 
   coronaMesh.lookAt(camera.position);
 
@@ -492,6 +491,7 @@ function animation() {
 
   controls.target.set(...cameraPivotPoint);
   controls.update();
+  // camera.lookAt(...cameraPivotPoint);
 
   renderer.render(scene, camera);
 
@@ -503,7 +503,7 @@ function animation() {
 
 function moveCamera() {
 
-  const s = window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight); // Scroll parameter, from 0 to 1
+  const s = window.pageYOffset;
 
   // Init
   if (s === 0) {
@@ -518,7 +518,7 @@ function moveCamera() {
 
   // To Mercury animation
   let start = 0;
-  let end = (window.pageYOffset + toMercurySection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  let end = (window.pageYOffset + toMercurySection.getBoundingClientRect().bottom) - window.innerHeight;
   if (start < s && s <= end) {
     const interval = end - start;
     cameraPivotPoint.set(
@@ -539,8 +539,8 @@ function moveCamera() {
   }
 
   // Mercury shot
-  start = (window.pageYOffset + toMercurySection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + mercurySection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + toMercurySection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + mercurySection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...mercuryCPP);
     cameraOrbitPosition.setFromSpherical(mercuryCOPSpherical);
@@ -552,8 +552,8 @@ function moveCamera() {
   }
 
   // To Venus animation
-  start = (window.pageYOffset + mercurySection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + toVenusSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + mercurySection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toVenusSection.getBoundingClientRect().bottom) - window.innerHeight;
   if (start < s && s <= end) {
     const interval = end - start;
     cameraPivotPoint.set(
@@ -583,8 +583,8 @@ function moveCamera() {
   }
 
   // Venus shot
-  start = (window.pageYOffset + toVenusSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + venusSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + toVenusSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + venusSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...venusCPP);
     cameraOrbitPosition.setFromSpherical(venusCOPSpherical);
@@ -596,8 +596,8 @@ function moveCamera() {
   }
 
   // To Earth animation
-  start = (window.pageYOffset + venusSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + toEarthSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + venusSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toEarthSection.getBoundingClientRect().bottom) - window.innerHeight;
   if (start < s && s <= end) {
     const interval = end - start;
     cameraPivotPoint.set(
@@ -627,8 +627,8 @@ function moveCamera() {
   }
 
   // Earth shot
-  start = (window.pageYOffset + toEarthSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + earthSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + toEarthSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + earthSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...earthCPP);
     cameraOrbitPosition.setFromSpherical(earthCOPSpherical);
@@ -640,8 +640,8 @@ function moveCamera() {
   }
 
   // To Mars animation
-  start = (window.pageYOffset + earthSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + earthSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) - window.innerHeight;
   if (start < s && s <= end) {
     const interval = end - start;
     cameraPivotPoint.set(
@@ -671,8 +671,8 @@ function moveCamera() {
   }
 
   // Mars shot
-  start = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + marsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + marsSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...marsCPP);
     cameraOrbitPosition.setFromSpherical(marsCOPSpherical);
@@ -684,8 +684,8 @@ function moveCamera() {
   }
 
   // To Jupiter animation
-  start = (window.pageYOffset + marsSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + marsSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) - window.innerHeight;
   if (start < s && s <= end) {
     const interval = end - start;
     cameraPivotPoint.set(
@@ -715,8 +715,8 @@ function moveCamera() {
   }
 
   // Jupiter shot
-  start = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
-  end = (window.pageYOffset + jupiterSection.getBoundingClientRect().bottom) / document.documentElement.scrollHeight;
+  start = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + jupiterSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...jupiterCPP);
     cameraOrbitPosition.setFromSpherical(jupiterCOPSpherical);
