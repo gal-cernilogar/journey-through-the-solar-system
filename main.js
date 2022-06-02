@@ -18,6 +18,7 @@ import moonTextureURL from '/images/textures/2k_moon.jpg';
 import marsTextureURL from '/images/textures/2k_mars.jpg';
 import jupiterTextureURL from '/images/textures/2k_jupiter.jpg';
 import saturnTextureURL from '/images/textures/2k_saturn.jpg';
+import saturnRingTextureURL from '/images/textures/2k_saturn_ring_alpha.png';
 import uranusTextureURL from '/images/textures/2k_uranus.jpg';
 import neptuneTextureURL from '/images/textures/2k_neptune.jpg';
 
@@ -31,11 +32,13 @@ const venusSection = document.querySelector('#venus');
 const earthSection = document.querySelector('#earth');
 const marsSection = document.querySelector('#mars');
 const jupiterSection = document.querySelector('#jupiter');
+const saturnSection = document.querySelector('#saturn');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
 const toMarsSection = document.querySelector('#toMarsSection');
 const toJupiterSection = document.querySelector('#toJupiterSection');
+const toSaturnSection = document.querySelector('#toSaturnSection');
 
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -311,7 +314,27 @@ const saturnGeometry = new THREE.SphereBufferGeometry(saturnRadius, sphereSegmen
 const saturnMesh = new THREE.Mesh(saturnGeometry, saturnMaterial);
 const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - PI / 4);
 saturnMesh.position.setFromSpherical(saturnSpherical);
+saturnMesh.rotation.z = PI * 0.1485;
+saturnMesh.rotation.y = - PI * 0.1485;
 scene.add(saturnMesh);
+
+const saturnRingTexture = new THREE.TextureLoader().load(saturnRingTextureURL);
+const saturnRingMaterial = new THREE.MeshBasicMaterial({
+  map: saturnRingTexture,
+  color: 0xffffff,
+  side: THREE.DoubleSide,
+  transparent: true
+});
+const saturnRingGeometry = new THREE.RingBufferGeometry(saturnRadius * 1.3062, saturnRadius * 2.2859, sphereSegmentsHor);
+const pos = saturnRingGeometry.attributes.position;
+const v3 = new THREE.Vector3();
+for (let i = 0; i < pos.count; i++) {
+  v3.fromBufferAttribute(pos, i);
+  saturnRingGeometry.attributes.uv.setXY(i, v3.length() < saturnRadius * 1.79605 ? 0 : 1, 1);
+}
+const saturnRingMesh = new THREE.Mesh(saturnRingGeometry, saturnRingMaterial);
+saturnRingMesh.rotation.x = PI / 2;
+saturnMesh.add(saturnRingMesh);
 
 const saturnCPP = new THREE.Vector3();
 const saturnCPPOffset = new THREE.Vector3().setFromSphericalCoords(saturnRadius, PI / 2, saturnSpherical.theta - PI / 2);;
@@ -394,7 +417,7 @@ function mobileMediaChange(mediaQuery) {
     earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
     marsCOPSpherical.set(marsRadius * 6, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 6, PI / 2.1, PI * 0.3);
-    saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 0.8);
+    saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.8);
 
@@ -451,7 +474,7 @@ function mobileMediaChange(mediaQuery) {
     earthCOPSpherical.set(earthRadius * 3, PI / 2.1, PI * 0.8);
     marsCOPSpherical.set(marsRadius * 3, PI / 2.1, PI * 1.7);
     jupiterCOPSpherical.set(jupiterRadius * 3, PI / 2.1, PI * 0.3);
-    saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 0.8);
+    saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * 0.8);
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.8);
 
@@ -720,6 +743,50 @@ function moveCamera() {
   if (start < s && s <= end) {
     cameraPivotPoint.set(...jupiterCPP);
     cameraOrbitPosition.setFromSpherical(jupiterCOPSpherical);
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // To Saturn animation
+  start = (window.pageYOffset + jupiterSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toSaturnSection.getBoundingClientRect().bottom) - window.innerHeight;
+  if (start < s && s <= end) {
+    const interval = end - start;
+    cameraPivotPoint.set(
+      jupiterCPP.x + (saturnCPP.x - jupiterCPP.x) * easeInOutQuint((s - start) / interval),
+      jupiterCPP.y + (saturnCPP.y - jupiterCPP.y) * easeInOutQuint((s - start) / interval),
+      jupiterCPP.z + (saturnCPP.z - jupiterCPP.z) * easeInOutQuint((s - start) / interval)
+    );
+    if (start < s && s <= start + interval / 2) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        jupiterCOPSpherical.radius + 100 * easeInOutQuint((s - start) / interval),
+        jupiterCOPSpherical.phi + (saturnCOPSpherical.phi - jupiterCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        jupiterCOPSpherical.theta + (saturnCOPSpherical.theta - jupiterCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    if (start + interval / 2 < s && s <= end) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        (jupiterCOPSpherical.radius + 100) + saturnCOPSpherical.radius - (jupiterCOPSpherical.radius + 100) * easeInOutQuint((s - start) / interval),
+        jupiterCOPSpherical.phi + (saturnCOPSpherical.phi - jupiterCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        jupiterCOPSpherical.theta + (saturnCOPSpherical.theta - jupiterCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      );
+    }
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // Saturn shot
+  start = (window.pageYOffset + toSaturnSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + saturnSection.getBoundingClientRect().bottom);
+  if (start < s && s <= end) {
+    cameraPivotPoint.set(...saturnCPP);
+    cameraOrbitPosition.setFromSpherical(saturnCOPSpherical);
     camera.position.set(
       cameraPivotPoint.x + cameraOrbitPosition.x,
       cameraPivotPoint.y + cameraOrbitPosition.y,
