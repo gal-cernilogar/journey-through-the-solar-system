@@ -59,7 +59,9 @@ a {
   color: white;
 }
 
-img {
+img,
+#h5p-video,
+#h5p-quiz {
   width: 100%;
   border-radius: 1em;
 }
@@ -180,6 +182,10 @@ li {
 }
 .source a:hover {
   color: white;
+}
+
+section#quiz {
+  padding-block-end: 5em;
 }
 
 @media (min-width: 1024px) {

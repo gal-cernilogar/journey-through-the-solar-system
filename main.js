@@ -46,6 +46,8 @@ const jupiterSection = document.querySelector('#jupiter');
 const saturnSection = document.querySelector('#saturn');
 const uranusSection = document.querySelector('#uranus');
 const neptuneSection = document.querySelector('#neptune');
+const sunSection = document.querySelector('#sun');
+const quizSection = document.querySelector('#quiz');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
@@ -54,6 +56,7 @@ const toJupiterSection = document.querySelector('#toJupiterSection');
 const toSaturnSection = document.querySelector('#toSaturnSection');
 const toUranusSection = document.querySelector('#toUranusSection');
 const toNeptuneSection = document.querySelector('#toNeptuneSection');
+const toSunSection = document.querySelector('#toSunSection');
 
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -172,14 +175,14 @@ const sunLight = new THREE.PointLight(0xffffff, 1);
 scene.add(sunLight);
 
 // Stars
-/* const starsTexture = new THREE.TextureLoader().load(starsTextureURL);
-const starsMaterial = new THREE.MeshBasicMaterial({
-  map: starsTexture,
-  side: THREE.BackSide
-});
-const starsGeometry = new THREE.BoxBufferGeometry(1000, 500, 1000);
-const starsMesh = new THREE.Mesh(starsGeometry, starsMaterial);
-scene.add(starsMesh); */
+// const starsTexture = new THREE.TextureLoader().load(starsTextureURL);
+// const starsMaterial = new THREE.MeshBasicMaterial({
+//   map: starsTexture,
+//   side: THREE.BackSide
+// });
+// const starsGeometry = new THREE.BoxBufferGeometry(1000, 500, 1000);
+// const stars = new THREE.Mesh(starsGeometry, starsMaterial);
+// scene.add(stars);
 
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 const starsGeometry = new THREE.BufferGeometry();
@@ -229,6 +232,7 @@ const sunGeometry = new THREE.SphereBufferGeometry(sunRadius, sphereSegmentsHor,
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
 scene.add(sunMesh);
 
+const welcomeCOPSpherical = new THREE.Spherical();
 const sunCPP = new THREE.Vector3();
 const sunCOPSpherical = new THREE.Spherical();
 
@@ -418,7 +422,6 @@ function mobileMediaChange(mediaQuery) {
   if (mediaQuery.matches) {
 
     // If media query matches
-    sunCPP.set(...sunMesh.position);
     mercuryCPP.set(...mercuryMesh.position);
     venusCPP.set(...venusMesh.position);
     earthCPP.set(...earthMesh.position);
@@ -427,8 +430,9 @@ function mobileMediaChange(mediaQuery) {
     saturnCPP.set(...saturnMesh.position);
     uranusCPP.set(...uranusMesh.position);
     neptuneCPP.set(...neptuneMesh.position);
+    sunCPP.set(...sunMesh.position);
 
-    sunCOPSpherical.set(sunRadius * 6, PI / 2.05, PI / 100);
+    welcomeCOPSpherical.set(sunRadius * 6, PI / 2.05, PI / 100);
     mercuryCOPSpherical.set(mercuryRadius * 6, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 6, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
@@ -437,13 +441,13 @@ function mobileMediaChange(mediaQuery) {
     saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * (-0.2));
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.5);
+    sunCOPSpherical.set(sunRadius * 6, PI / 2, 5 * PI / 4);
 
     window.addEventListener('scroll', moveCamera);
     moveCamera();
   } else {
 
     // If media query doesn't match
-    sunCPP.set(...sunMesh.position);
     mercuryCPP.set(
       mercuryMesh.position.x + mercuryCPPOffset.x,
       mercuryMesh.position.y + mercuryCPPOffset.y,
@@ -484,8 +488,9 @@ function mobileMediaChange(mediaQuery) {
       neptuneMesh.position.y + neptuneCPPOffset.y,
       neptuneMesh.position.z + neptuneCPPOffset.z
     );
+    sunCPP.set(...sunMesh.position);
 
-    sunCOPSpherical.set(sunRadius * 5, PI / 2.005, PI / 1000);
+    welcomeCOPSpherical.set(sunRadius * 5, PI / 2.005, PI / 1000);
     mercuryCOPSpherical.set(mercuryRadius * 3, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 3, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 3, PI / 2.1, PI * 0.8);
@@ -494,6 +499,7 @@ function mobileMediaChange(mediaQuery) {
     saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * (-0.2));
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.5);
+    sunCOPSpherical.set(sunRadius * 3, PI / 2, 5 * PI / 4);
 
     window.addEventListener('scroll', moveCamera);
     moveCamera();
@@ -515,7 +521,6 @@ function animation() {
   sunMaterial.uniforms.time.value = clock.elapsedTime;
   sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture;
 
-  //starsMesh.rotateY(- timeDelta * 0.02);
   stars.rotateY(- timeDelta * 0.02);
 
   coronaMesh.lookAt(camera.position);
@@ -548,7 +553,7 @@ function moveCamera() {
   // Init
   if (s === 0) {
     cameraPivotPoint.set(...sunCPP);
-    cameraOrbitPosition.setFromSpherical(sunCOPSpherical);
+    cameraOrbitPosition.setFromSpherical(welcomeCOPSpherical);
     camera.position.set(
       cameraPivotPoint.x + cameraOrbitPosition.x,
       cameraPivotPoint.y + cameraOrbitPosition.y,
@@ -567,9 +572,9 @@ function moveCamera() {
       mercuryCPP.z * easeInOutQuint((s - start) / interval)
     );
     cameraOrbitPosition.setFromSphericalCoords(
-      sunCOPSpherical.radius + (mercuryCOPSpherical.radius - sunCOPSpherical.radius) * easeInOutQuint((s - start) / interval),
-      sunCOPSpherical.phi + (mercuryCOPSpherical.phi - sunCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
-      sunCOPSpherical.theta + (mercuryCOPSpherical.theta - sunCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
+      welcomeCOPSpherical.radius + (mercuryCOPSpherical.radius - welcomeCOPSpherical.radius) * easeInOutQuint((s - start) / interval),
+      welcomeCOPSpherical.phi + (mercuryCOPSpherical.phi - welcomeCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+      welcomeCOPSpherical.theta + (mercuryCOPSpherical.theta - welcomeCOPSpherical.theta) * easeInOutQuint((s - start) / interval)
     );
     camera.position.set(
       cameraPivotPoint.x + cameraOrbitPosition.x,
@@ -892,6 +897,50 @@ function moveCamera() {
   if (start < s && s <= end) {
     cameraPivotPoint.set(...neptuneCPP);
     cameraOrbitPosition.setFromSpherical(neptuneCOPSpherical);
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // To Sun animation
+  start = (window.pageYOffset + neptuneSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + toSunSection.getBoundingClientRect().bottom) - window.innerHeight;
+  if (start < s && s <= end) {
+    const interval = end - start;
+    cameraPivotPoint.set(
+      neptuneCPP.x + (sunCPP.x - neptuneCPP.x) * easeInOutQuint((s - start) / interval),
+      neptuneCPP.y + (sunCPP.y - neptuneCPP.y) * easeInOutQuint((s - start) / interval),
+      neptuneCPP.z + (sunCPP.z - neptuneCPP.z) * easeInOutQuint((s - start) / interval)
+    );
+    if (start < s && s <= start + interval / 2) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        neptuneCOPSpherical.radius + 0 * easeInOutQuint((s - start) / interval),
+        neptuneCOPSpherical.phi + (sunCOPSpherical.phi - neptuneCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        neptuneCOPSpherical.theta + (sunCOPSpherical.theta - neptuneCOPSpherical.theta) * easeInOutQuint((s - start) / interval * 2)
+      );
+    }
+    if (start + interval / 2 < s && s <= end) {
+      cameraOrbitPosition.setFromSphericalCoords(
+        (neptuneCOPSpherical.radius + 0) + sunCOPSpherical.radius - (neptuneCOPSpherical.radius + 0) * easeInOutQuint((s - start) / interval),
+        neptuneCOPSpherical.phi + (sunCOPSpherical.phi - neptuneCOPSpherical.phi) * easeInOutQuint((s - start) / interval),
+        sunCOPSpherical.theta
+      );
+    }
+    camera.position.set(
+      cameraPivotPoint.x + cameraOrbitPosition.x,
+      cameraPivotPoint.y + cameraOrbitPosition.y,
+      cameraPivotPoint.z + cameraOrbitPosition.z
+    );
+  }
+
+  // Sun shot
+  start = (window.pageYOffset + toSunSection.getBoundingClientRect().bottom) - window.innerHeight;
+  end = (window.pageYOffset + quizSection.getBoundingClientRect().bottom);
+  if (start < s && s <= end) {
+    cameraPivotPoint.set(...sunCPP);
+    cameraOrbitPosition.setFromSpherical(sunCOPSpherical);
     camera.position.set(
       cameraPivotPoint.x + cameraOrbitPosition.x,
       cameraPivotPoint.y + cameraOrbitPosition.y,
