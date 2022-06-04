@@ -276,13 +276,14 @@ earthMesh.position.setFromSpherical(earthSpherical);
 scene.add(earthMesh);
 
 const cloudsTexture = new THREE.TextureLoader().load(cloudsTextureURL);
-const cloudsMaterial = new THREE.MeshLambertMaterial({
+const cloudsMaterial = new THREE.MeshPhongMaterial({
   map: cloudsTexture,
   opacity: 0.5,
   transparent: true,
-  blending: THREE.AdditiveBlending
+  blending: THREE.AdditiveBlending,
+  shininess: 0
 });
-const cloudsGeometry = new THREE.SphereBufferGeometry(earthRadius * 1, sphereSegmentsHor, sphereSegmentsVer);
+const cloudsGeometry = new THREE.SphereBufferGeometry(earthRadius * 1.01, sphereSegmentsHor, sphereSegmentsVer);
 const cloudsMesh = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
 earthMesh.add(cloudsMesh);
 
