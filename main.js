@@ -121,6 +121,17 @@ const uranusSunDist = 2115 / 10;
 const neptuneSunDist = 3215 / 10;
 
 const clock = new THREE.Clock();
+const mouse = {
+  x: 0,
+  y: 0
+}
+window.addEventListener('mousemove', (event) => {
+  mouse.x = (event.clientX / innerWidth) * 2 - 1;
+  // mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+});
+window.addEventListener('deviceorientation', (event) => {
+  mouse.x = event.gamma / 90;
+});
 
 let sphereSegmentsHor;
 let sphereSegmentsVer;
@@ -230,7 +241,9 @@ const sunMaterial = new THREE.ShaderMaterial({
 });
 const sunGeometry = new THREE.SphereBufferGeometry(sunRadius, sphereSegmentsHor, sphereSegmentsVer);
 const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
-scene.add(sunMesh);
+const sun = new THREE.Object3D();
+sun.add(sunMesh);
+scene.add(sun);
 
 const welcomeCOPSpherical = new THREE.Spherical();
 const sunCPP = new THREE.Vector3();
@@ -242,8 +255,10 @@ const mercuryMaterial = new THREE.MeshPhongMaterial({ map: mercuryTexture, shini
 const mercuryGeometry = new THREE.SphereBufferGeometry(mercuryRadius, sphereSegmentsHor, sphereSegmentsVer);
 const mercuryMesh = new THREE.Mesh(mercuryGeometry, mercuryMaterial);
 const mercurySpherical = new THREE.Spherical(mercurySunDist, PI / 2, - PI / 300);
-mercuryMesh.position.setFromSpherical(mercurySpherical);
-scene.add(mercuryMesh);
+const mercury = new THREE.Object3D();
+mercury.add(mercuryMesh);
+mercury.position.setFromSpherical(mercurySpherical);
+scene.add(mercury);
 
 const mercuryCPP = new THREE.Vector3();
 const mercuryCPPOffset = new THREE.Vector3().setFromSphericalCoords(mercuryRadius, PI / 2, mercurySpherical.theta + PI / 2);
@@ -255,8 +270,10 @@ const venusMaterial = new THREE.MeshPhongMaterial({ map: venusTexture, shininess
 const venusGeometry = new THREE.SphereBufferGeometry(venusRadius, sphereSegmentsHor, sphereSegmentsVer);
 const venusMesh = new THREE.Mesh(venusGeometry, venusMaterial);
 const venusSpherical = new THREE.Spherical(venusSunDist, PI / 2, PI / 4);
-venusMesh.position.setFromSpherical(venusSpherical);
-scene.add(venusMesh);
+const venus = new THREE.Object3D();
+venus.add(venusMesh);
+venus.position.setFromSpherical(venusSpherical);
+scene.add(venus);
 
 const venusCPP = new THREE.Vector3();
 const venusCPPOffset = new THREE.Vector3().setFromSphericalCoords(venusRadius, PI / 2, venusSpherical.theta - PI / 2);
@@ -272,8 +289,10 @@ const earthMaterial = new THREE.MeshPhongMaterial({
 const earthGeometry = new THREE.SphereBufferGeometry(earthRadius, sphereSegmentsHor, sphereSegmentsVer);
 const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
 const earthSpherical = new THREE.Spherical(earthSunDist, PI / 2, 0);
-earthMesh.position.setFromSpherical(earthSpherical);
-scene.add(earthMesh);
+const earth = new THREE.Object3D();
+earth.add(earthMesh);
+earth.position.setFromSpherical(earthSpherical);
+scene.add(earth);
 
 const cloudsTexture = new THREE.TextureLoader().load(cloudsTextureURL);
 const cloudsMaterial = new THREE.MeshPhongMaterial({
@@ -307,8 +326,10 @@ const marsMaterial = new THREE.MeshPhongMaterial({ map: marsTexture, shininess: 
 const marsGeometry = new THREE.SphereBufferGeometry(marsRadius, sphereSegmentsHor, sphereSegmentsVer);
 const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
 const marsSpherical = new THREE.Spherical(marsSunDist, PI / 2, PI / 2);
-marsMesh.position.setFromSpherical(marsSpherical);
-scene.add(marsMesh);
+const mars = new THREE.Object3D();
+mars.add(marsMesh);
+mars.position.setFromSpherical(marsSpherical);
+scene.add(mars);
 
 const marsCPP = new THREE.Vector3();
 const marsCPPOffset = new THREE.Vector3().setFromSphericalCoords(marsRadius, PI / 2, marsSpherical.theta - PI / 2);
@@ -320,8 +341,10 @@ const jupiterMaterial = new THREE.MeshPhongMaterial({ map: jupiterTexture, shini
 const jupiterGeometry = new THREE.SphereBufferGeometry(jupiterRadius, sphereSegmentsHor, sphereSegmentsVer);
 const jupiterMesh = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
 const jupiterSpherical = new THREE.Spherical(jupiterSunDist, PI / 2, - PI / 2);
-jupiterMesh.position.setFromSpherical(jupiterSpherical);
-scene.add(jupiterMesh);
+const jupiter = new THREE.Object3D();
+jupiter.add(jupiterMesh);
+jupiter.position.setFromSpherical(jupiterSpherical);
+scene.add(jupiter);
 
 const jupiterCPP = new THREE.Vector3();
 const jupiterCPPOffset = new THREE.Vector3().setFromSphericalCoords(jupiterRadius, PI / 2, jupiterSpherical.theta + PI / 2);
@@ -333,10 +356,12 @@ const saturnMaterial = new THREE.MeshPhongMaterial({ map: saturnTexture, shinine
 const saturnGeometry = new THREE.SphereBufferGeometry(saturnRadius, sphereSegmentsHor, sphereSegmentsVer);
 const saturnMesh = new THREE.Mesh(saturnGeometry, saturnMaterial);
 const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - PI / 4);
-saturnMesh.position.setFromSpherical(saturnSpherical);
+const saturn = new THREE.Object3D();
+saturn.add(saturnMesh);
+saturn.position.setFromSpherical(saturnSpherical);
 saturnMesh.rotation.z = PI * 0.1485;
 saturnMesh.rotation.y = - PI * 0.1485;
-scene.add(saturnMesh);
+scene.add(saturn);
 
 const saturnRingTexture = new THREE.TextureLoader().load(saturnRingTextureURL);
 const saturnRingMaterial = new THREE.MeshBasicMaterial({
@@ -366,10 +391,12 @@ const uranusMaterial = new THREE.MeshPhongMaterial({ map: uranusTexture, shinine
 const uranusGeometry = new THREE.SphereBufferGeometry(uranusRadius, sphereSegmentsHor, sphereSegmentsVer);
 const uranusMesh = new THREE.Mesh(uranusGeometry, uranusMaterial);
 const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, PI);
-uranusMesh.position.setFromSpherical(uranusSpherical);
+const uranus = new THREE.Object3D();
+uranus.add(uranusMesh);
+uranus.position.setFromSpherical(uranusSpherical);
 uranusMesh.rotation.z = - PI / 2;
 uranusMesh.rotation.y = - PI / 4;
-scene.add(uranusMesh);
+scene.add(uranus);
 
 const uranusCPP = new THREE.Vector3();
 const uranusCPPOffset = new THREE.Vector3().setFromSphericalCoords(uranusRadius, PI / 2, uranusSpherical.theta + PI / 2);;
@@ -381,8 +408,10 @@ const neptuneMaterial = new THREE.MeshPhongMaterial({ map: neptuneTexture, shini
 const neptuneGeometry = new THREE.SphereBufferGeometry(neptuneRadius, sphereSegmentsHor, sphereSegmentsVer);
 const neptuneMesh = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
 const neptuneSpherical = new THREE.Spherical(neptuneSunDist, PI / 2, - 3 * PI / 4);
-neptuneMesh.position.setFromSpherical(neptuneSpherical);
-scene.add(neptuneMesh);
+const neptune = new THREE.Object3D();
+neptune.add(neptuneMesh);
+neptune.position.setFromSpherical(neptuneSpherical);
+scene.add(neptune);
 
 const neptuneCPP = new THREE.Vector3();
 const neptuneCPPOffset = new THREE.Vector3().setFromSphericalCoords(neptuneRadius, PI / 2, neptuneSpherical.theta - PI / 2);;
@@ -423,15 +452,15 @@ function mobileMediaChange(mediaQuery) {
   if (mediaQuery.matches) {
 
     // If media query matches
-    mercuryCPP.set(...mercuryMesh.position);
-    venusCPP.set(...venusMesh.position);
-    earthCPP.set(...earthMesh.position);
-    marsCPP.set(...marsMesh.position);
-    jupiterCPP.set(...jupiterMesh.position);
-    saturnCPP.set(...saturnMesh.position);
-    uranusCPP.set(...uranusMesh.position);
-    neptuneCPP.set(...neptuneMesh.position);
-    sunCPP.set(...sunMesh.position);
+    mercuryCPP.set(...mercury.position);
+    venusCPP.set(...venus.position);
+    earthCPP.set(...earth.position);
+    marsCPP.set(...mars.position);
+    jupiterCPP.set(...jupiter.position);
+    saturnCPP.set(...saturn.position);
+    uranusCPP.set(...uranus.position);
+    neptuneCPP.set(...neptune.position);
+    sunCPP.set(...sun.position);
 
     welcomeCOPSpherical.set(sunRadius * 6, PI / 2.05, PI / 100);
     mercuryCOPSpherical.set(mercuryRadius * 6, PI / 2.1, PI * 0.8);
@@ -450,46 +479,46 @@ function mobileMediaChange(mediaQuery) {
 
     // If media query doesn't match
     mercuryCPP.set(
-      mercuryMesh.position.x + mercuryCPPOffset.x,
-      mercuryMesh.position.y + mercuryCPPOffset.y,
-      mercuryMesh.position.z + mercuryCPPOffset.z
+      mercury.position.x + mercuryCPPOffset.x,
+      mercury.position.y + mercuryCPPOffset.y,
+      mercury.position.z + mercuryCPPOffset.z
     );
     venusCPP.set(
-      venusMesh.position.x + venusCPPOffset.x,
-      venusMesh.position.y + venusCPPOffset.y,
-      venusMesh.position.z + venusCPPOffset.z
+      venus.position.x + venusCPPOffset.x,
+      venus.position.y + venusCPPOffset.y,
+      venus.position.z + venusCPPOffset.z
     );
     earthCPP.set(
-      earthMesh.position.x + earthCPPOffset.x,
-      earthMesh.position.y + earthCPPOffset.y,
-      earthMesh.position.z + earthCPPOffset.z
+      earth.position.x + earthCPPOffset.x,
+      earth.position.y + earthCPPOffset.y,
+      earth.position.z + earthCPPOffset.z
     );
     marsCPP.set(
-      marsMesh.position.x + marsCPPOffset.x,
-      marsMesh.position.y + marsCPPOffset.y,
-      marsMesh.position.z + marsCPPOffset.z
+      mars.position.x + marsCPPOffset.x,
+      mars.position.y + marsCPPOffset.y,
+      mars.position.z + marsCPPOffset.z
     );
     jupiterCPP.set(
-      jupiterMesh.position.x + jupiterCPPOffset.x,
-      jupiterMesh.position.y + jupiterCPPOffset.y,
-      jupiterMesh.position.z + jupiterCPPOffset.z
+      jupiter.position.x + jupiterCPPOffset.x,
+      jupiter.position.y + jupiterCPPOffset.y,
+      jupiter.position.z + jupiterCPPOffset.z
     );
     saturnCPP.set(
-      saturnMesh.position.x + saturnCPPOffset.x,
-      saturnMesh.position.y + saturnCPPOffset.y,
-      saturnMesh.position.z + saturnCPPOffset.z
+      saturn.position.x + saturnCPPOffset.x,
+      saturn.position.y + saturnCPPOffset.y,
+      saturn.position.z + saturnCPPOffset.z
     );
     uranusCPP.set(
-      uranusMesh.position.x + uranusCPPOffset.x,
-      uranusMesh.position.y + uranusCPPOffset.y,
-      uranusMesh.position.z + uranusCPPOffset.z
+      uranus.position.x + uranusCPPOffset.x,
+      uranus.position.y + uranusCPPOffset.y,
+      uranus.position.z + uranusCPPOffset.z
     );
     neptuneCPP.set(
-      neptuneMesh.position.x + neptuneCPPOffset.x,
-      neptuneMesh.position.y + neptuneCPPOffset.y,
-      neptuneMesh.position.z + neptuneCPPOffset.z
+      neptune.position.x + neptuneCPPOffset.x,
+      neptune.position.y + neptuneCPPOffset.y,
+      neptune.position.z + neptuneCPPOffset.z
     );
-    sunCPP.set(...sunMesh.position);
+    sunCPP.set(...sun.position);
 
     welcomeCOPSpherical.set(sunRadius * 5, PI / 2.005, PI / 1000);
     mercuryCOPSpherical.set(mercuryRadius * 3, PI / 2.1, PI * 0.8);
@@ -534,6 +563,25 @@ function animation() {
   saturnMesh.rotateY(timeDelta * 0.1);
   uranusMesh.rotateY(timeDelta * (- 0.1));
   neptuneMesh.rotateY(timeDelta * 0.1);
+
+  mercury.rotation.y = mouse.x / 2;
+  // mercury.rotation.x = mouse.y / 2;
+  venus.rotation.y = mouse.x / 2;
+  // venus.rotation.x = mouse.y / 2;
+  earth.rotation.y = mouse.x / 2;
+  // earth.rotation.x = mouse.y / 2;
+  mars.rotation.y = mouse.x / 2;
+  // mars.rotation.x = mouse.y / 2;
+  jupiter.rotation.y = mouse.x / 2;
+  // jupiter.rotation.x = mouse.y / 2;
+  saturn.rotation.y = mouse.x / 2;
+  // saturn.rotation.x = mouse.y / 2;
+  uranus.rotation.y = mouse.x / 2;
+  // uranus.rotation.x = mouse.y / 2;
+  neptune.rotation.y = mouse.x / 2;
+  // neptune.rotation.x = mouse.y / 2;
+  sun.rotation.y = mouse.x / 2;
+  // sun.rotation.x = mouse.y / 2;
 
   controls.target.set(...cameraPivotPoint);
   controls.update();
