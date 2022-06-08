@@ -152,10 +152,23 @@ li {
   flex-wrap: wrap;
 }
 
-.nav-item {
+.nav-item,
+#permission-btn {
   display: inline-block;
   font-size: 0.875rem;
   font-weight: 700;
+}
+
+#permission-btn {
+  padding: 0em;
+  color: rgb(10, 132, 255);
+  background-color: transparent;
+  border: none;
+}
+
+#permission-btn:hover {
+  color: rgb(100, 210, 255);
+  cursor: pointer;
 }
 
 #title {
