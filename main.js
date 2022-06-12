@@ -612,8 +612,6 @@ function animation() {
   // uranus.rotation.x = mouse.y / 2;
   neptune.rotation.y = mouse.x / 2;
   // neptune.rotation.x = mouse.y / 2;
-  sun.rotation.y = mouse.x / 2;
-  // sun.rotation.x = mouse.y / 2;
 
   controls.target.set(...cameraPivotPoint);
   controls.update();
@@ -1018,7 +1016,7 @@ function moveCamera() {
 
   // Sun shot
   start = (window.pageYOffset + toSunSection.getBoundingClientRect().bottom) - window.innerHeight;
-  end = (window.pageYOffset + quizSection.getBoundingClientRect().bottom);
+  end = (window.pageYOffset + sunSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
     cameraPivotPoint.set(...sunCPP);
     cameraOrbitPosition.setFromSpherical(sunCOPSpherical);
