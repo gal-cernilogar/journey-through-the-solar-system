@@ -12,6 +12,7 @@ dist
 dist-ssr
 images/textures/unused
 images/textures/tifs
+DaVinci
 *.local
 
 # Editor directories and files
