@@ -9,28 +9,17 @@ import coronaFragment from '/shaders/coronaShader/fragment.glsl';
 import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
 // import starsTextureURL from '/images/textures/2k_stars.jpg';
-// import mercuryTextureURL from '/images/textures/2k_mercury.jpg';
 import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
-// import venusTextureURL from '/images/textures/2k_venus_surface.jpg';
 import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
-// import earthTextureURL from '/images/textures/2k_earth_daymap.jpg';
 import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
-// import earthSpecularMapURL from '/images/textures/2k_earth_specular_map.png';
 import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
-// import cloudsTextureURL from '/images/textures/2k_earth_clouds.jpg';
 import cloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
-// import moonTextureURL from '/images/textures/2k_moon.jpg';
 import moonTextureURL from '/images/textures/2k_moon-optimized.jpg';
-// import marsTextureURL from '/images/textures/2k_mars.jpg';
 import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
-// import jupiterTextureURL from '/images/textures/2k_jupiter.jpg';
 import jupiterTextureURL from '/images/textures/2k_jupiter-optimized.jpg';
-// import saturnTextureURL from '/images/textures/2k_saturn.jpg';
 import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
 import saturnRingTextureURL from '/images/textures/2k_saturn_ring_alpha.png';
-// import uranusTextureURL from '/images/textures/2k_uranus.jpg';
 import uranusTextureURL from '/images/textures/2k_uranus-optimized.jpg';
-// import neptuneTextureURL from '/images/textures/2k_neptune.jpg';
 import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
 
 
@@ -47,7 +36,6 @@ const saturnSection = document.querySelector('#saturn');
 const uranusSection = document.querySelector('#uranus');
 const neptuneSection = document.querySelector('#neptune');
 const sunSection = document.querySelector('#sun');
-const quizSection = document.querySelector('#quiz');
 const toMercurySection = document.querySelector('#toMercurySection');
 const toVenusSection = document.querySelector('#toVenusSection');
 const toEarthSection = document.querySelector('#toEarthSection');
@@ -122,49 +110,6 @@ const saturnSunDist = 1060 / 10;
 const uranusSunDist = 2115 / 10;
 const neptuneSunDist = 3215 / 10;
 
-const clock = new THREE.Clock();
-const mouse = {
-  x: 0,
-  y: 0
-}
-
-function mousemoveHandler(event) {
-  mouse.x = (event.clientX / innerWidth) * 2 - 1;
-  // mouse.y = -(event.clientY / innerHeight) * 2 + 1;
-}
-
-function deviceorientationHandler(event) {
-  if (window.innerWidth < window.innerHeight) {
-    mouse.x = event.gamma / 90;
-  } else {
-    mouse.x = event.beta * 2 / 180;
-  }
-}
-
-function permissionHandler() {
-  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-    // Handle iOS 13+ devices.
-    DeviceOrientationEvent.requestPermission()
-      .then((state) => {
-        if (state === 'granted') {
-          window.addEventListener('deviceorientation', deviceorientationHandler);
-          permissionBtn.remove();
-        } else {
-          console.error('Request to access the orientation was rejected');
-        }
-      })
-      .catch(console.error);
-  } else {
-    // Handle regular non iOS 13+ devices.
-    window.addEventListener('deviceorientation', deviceorientationHandler);
-  }
-  permissionBtn.remove();
-}
-
-window.addEventListener('mousemove', mousemoveHandler);
-window.addEventListener('deviceorientation', deviceorientationHandler);
-permissionBtn.addEventListener('click', permissionHandler);
-
 let sphereSegmentsHor;
 let sphereSegmentsVer;
 if (mobile.matches) {
@@ -174,6 +119,52 @@ if (mobile.matches) {
   sphereSegmentsHor = 64;
   sphereSegmentsVer = sphereSegmentsHor / 2;
 }
+
+const clock = new THREE.Clock();
+const mouse = {
+  x: 0,
+  y: 0
+}
+
+function mouseMoveHandler(event) {
+  mouse.x = (event.clientX / innerWidth) * 2 - 1;
+  // mouse.y = -(event.clientY / innerHeight) * 2 + 1;
+}
+
+window.addEventListener('mousemove', mouseMoveHandler);
+
+function deviceOrientationHandler(event) {
+  if (window.innerWidth < window.innerHeight) {
+    mouse.x = event.gamma / 90;
+  } else {
+    mouse.x = event.beta * 2 / 180;
+  }
+}
+
+window.addEventListener('deviceorientation', deviceOrientationHandler);
+
+
+function permissionHandler() {
+  if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // Handle iOS 13+ devices.
+    DeviceOrientationEvent.requestPermission()
+      .then((state) => {
+        if (state === 'granted') {
+          window.addEventListener('deviceorientation', deviceOrientationHandler);
+          permissionBtn.remove();
+        } else {
+          console.error('Request to access the orientation was rejected');
+        }
+      })
+      .catch(console.error);
+  } else {
+    // Handle regular non iOS 13+ devices.
+    window.addEventListener('deviceorientation', deviceOrientationHandler);
+  }
+  permissionBtn.remove();
+}
+
+permissionBtn.addEventListener('click', permissionHandler);
 
 
 
@@ -206,9 +197,8 @@ offScene.add(perlinMesh);
 
 // On scene
 
-const cameraPivotPoint = new THREE.Vector3(); // CPP
-
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 2000);
+const cameraPivotPoint = new THREE.Vector3(); // CPP
 const cameraOrbitPosition = new THREE.Vector3(); // COP
 
 const scene = new THREE.Scene();
@@ -230,7 +220,6 @@ scene.add(sunLight);
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 const starsGeometry = new THREE.BufferGeometry();
 
-createStars();
 function createStars() {
   const starSpherical = new THREE.Spherical();
   const starCartesian = new THREE.Vector3();
@@ -247,6 +236,8 @@ function createStars() {
   }
   starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
 }
+
+createStars();
 
 const stars = new THREE.Points(starsGeometry, starsMaterial);
 scene.add(stars);
@@ -477,8 +468,6 @@ controls.autoRotateSpeed = -0.5; */
 
 // MEDIA QUERY //
 
-mobileMediaChange(mobile); // Call listener function at run time
-
 function mobileMediaChange(mediaQuery) {
 
   if (mediaQuery.matches) {
@@ -505,8 +494,8 @@ function mobileMediaChange(mediaQuery) {
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.5);
     sunCOPSpherical.set(sunRadius * 6, PI / 2, 5 * PI / 4);
 
-    window.addEventListener('scroll', moveCamera);
-    moveCamera();
+    onScrollAnimation();
+
   } else {
 
     // If media query doesn't match
@@ -563,12 +552,13 @@ function mobileMediaChange(mediaQuery) {
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.5);
     sunCOPSpherical.set(sunRadius * 3, PI / 2, 5 * PI / 4);
 
-    window.addEventListener('scroll', moveCamera);
-    moveCamera();
+    onScrollAnimation();
 
   }
 
 }
+
+mobileMediaChange(mobile);
 
 
 
@@ -597,21 +587,13 @@ function animation() {
   neptuneMesh.rotateY(timeDelta * 0.1);
 
   mercury.rotation.y = mouse.x / 2;
-  // mercury.rotation.x = mouse.y / 2;
   venus.rotation.y = mouse.x / 2;
-  // venus.rotation.x = mouse.y / 2;
   earth.rotation.y = mouse.x / 2;
-  // earth.rotation.x = mouse.y / 2;
   mars.rotation.y = mouse.x / 2;
-  // mars.rotation.x = mouse.y / 2;
   jupiter.rotation.y = mouse.x / 2;
-  // jupiter.rotation.x = mouse.y / 2;
   saturn.rotation.y = mouse.x / 2;
-  // saturn.rotation.x = mouse.y / 2;
   uranus.rotation.y = mouse.x / 2;
-  // uranus.rotation.x = mouse.y / 2;
   neptune.rotation.y = mouse.x / 2;
-  // neptune.rotation.x = mouse.y / 2;
 
   controls.target.set(...cameraPivotPoint);
   controls.update();
@@ -621,11 +603,13 @@ function animation() {
 
 }
 
+animation();
+
 
 
 // ON SCROLL ANIMATION //
 
-function moveCamera() {
+function onScrollAnimation() {
 
   const s = window.pageYOffset;
 
@@ -1028,6 +1012,8 @@ function moveCamera() {
   }
 
 }
+
+window.addEventListener('scroll', onScrollAnimation);
 
 
 
