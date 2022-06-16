@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:ital,wght@0,400;0,700;0,900;1,400&display=swap");
+
 ::-webkit-scrollbar {
   width: 0.5em;
 }
@@ -188,14 +190,14 @@ li {
 }
 
 #title {
-  font-size: clamp(1rem, 15vw, 10rem);
+  font-size: clamp(3rem, 8vw, 7rem);
   font-weight: 900;
   text-align: center;
 }
 
 .scroll-indicator {
   position: absolute;
-  bottom: 2em;
+  bottom: 5em;
   margin: auto;
   display: flex;
   flex-direction: column;
