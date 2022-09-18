@@ -190,7 +190,7 @@ li {
 }
 
 #title {
-  font-size: clamp(3rem, 8vw, 7rem);
+  font-size: clamp(2.5rem, 8vw, 7rem);
   font-weight: 900;
   text-align: center;
 }
