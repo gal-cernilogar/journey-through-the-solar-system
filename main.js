@@ -1,12 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PI, acos, random, easeInOutQuint } from "./modules/math.js";
 
-import perlinFragment from '/shaders/perlinShader/fragment.glsl';
-import perlinVertex from '/shaders/perlinShader/vertex.glsl';
-import sunVertex from '/shaders/sunShader/vertex.glsl';
-import sunFragment from '/shaders/sunShader/fragment.glsl';
-import coronaFragment from '/shaders/coronaShader/fragment.glsl';
-import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
 // import starsTextureURL from '/images/textures/2k_stars.jpg';
 import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
@@ -21,6 +16,7 @@ import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
 import saturnRingTextureURL from '/images/textures/2k_saturn_ring_alpha.png';
 import uranusTextureURL from '/images/textures/2k_uranus-optimized.jpg';
 import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
+import Sun from '/modules/sun.js';
 
 
 
@@ -50,46 +46,6 @@ const permissionBtn = document.querySelector('#permission-btn');
 
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
-const PI = Math.PI;
-const sin = Math.sin;
-const cos = Math.cos;
-const acos = Math.acos;
-const random = Math.random;
-
-function easeInOutSine(x) {
-  return -(cos(PI * x) - 1) / 2;
-}
-
-function easeInOutQuad(x) {
-  return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
-}
-
-function easeInOutCubic(x) {
-  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
-}
-
-function easeInOutQuart(x) {
-  return x < 0.5 ? 8 * x * x * x * x : 1 - Math.pow(-2 * x + 2, 4) / 2;
-}
-
-function easeInOutQuint(x) {
-  return x < 0.5 ? 16 * x * x * x * x * x : 1 - Math.pow(-2 * x + 2, 5) / 2;
-}
-
-function easeInOutExpo(x) {
-  return x === 0 ? 0
-    : x === 1 ? 1
-      : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2
-        : (2 - Math.pow(2, -20 * x + 10)) / 2;
-}
-
-function easeInOutCirc(x) {
-  return x < 0.5
-    ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
-    : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
-}
-
-const sunRadius = 1;
 const mercuryRadius = 0.0035 * 10;
 const venusRadius = 0.0087 * 10;
 const earthRadius = 0.0091 * 10;
@@ -166,37 +122,6 @@ function permissionHandler() {
 
 permissionBtn.addEventListener('click', permissionHandler);
 
-
-
-// Off scene
-
-const cubeRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
-  format: THREE.RGBAFormat,
-  generateMipmaps: true,
-  minFilter: THREE.LinearMipmapLinearFilter,
-  encoding: THREE.sRGBEncoding
-});
-
-const cubeCamera = new THREE.CubeCamera(0.5, 1.5, cubeRenderTarget);
-
-const offScene = new THREE.Scene();
-
-const perlinMaterial = new THREE.ShaderMaterial({
-  side: THREE.DoubleSide,
-  uniforms: {
-    time: { value: 0 },
-  },
-  vertexShader: perlinVertex,
-  fragmentShader: perlinFragment
-});
-const perlinGeometry = new THREE.SphereBufferGeometry(1, sphereSegmentsHor, sphereSegmentsVer);
-const perlinMesh = new THREE.Mesh(perlinGeometry, perlinMaterial);
-offScene.add(perlinMesh);
-
-
-
-// On scene
-
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 2000);
 const cameraPivotPoint = new THREE.Vector3(); // CPP
 const cameraOrbitPosition = new THREE.Vector3(); // COP
@@ -242,31 +167,11 @@ createStars();
 const stars = new THREE.Points(starsGeometry, starsMaterial);
 scene.add(stars);
 
-// The Sun
-const coronaMaterial = new THREE.ShaderMaterial({
-  side: THREE.BackSide,
-  blending: THREE.AdditiveBlending,
-  vertexShader: coronaVertex,
-  fragmentShader: coronaFragment
-});
-const coronaGeometry = new THREE.SphereBufferGeometry(sunRadius * 1.2, sphereSegmentsHor, sphereSegmentsVer);
-const coronaMesh = new THREE.Mesh(coronaGeometry, coronaMaterial);
-scene.add(coronaMesh);
-
-const sunMaterial = new THREE.ShaderMaterial({
-  side: THREE.DoubleSide,
-  uniforms: {
-    time: { value: 0 },
-    uPerlin: { value: null },
-  },
-  vertexShader: sunVertex,
-  fragmentShader: sunFragment
-});
-const sunGeometry = new THREE.SphereBufferGeometry(sunRadius, sphereSegmentsHor, sphereSegmentsVer);
-const sunMesh = new THREE.Mesh(sunGeometry, sunMaterial);
-const sun = new THREE.Object3D();
-sun.add(sunMesh);
-scene.add(sun);
+const testSun = new Sun();
+testSun.sphereSegments = 64;
+scene.add(testSun.corona);
+scene.add(testSun.sun);
+console.log(testSun)
 
 const welcomeCOPSpherical = new THREE.Spherical();
 const sunCPP = new THREE.Vector3();
@@ -481,9 +386,9 @@ function mobileMediaChange(mediaQuery) {
     saturnCPP.set(...saturn.position);
     uranusCPP.set(...uranus.position);
     neptuneCPP.set(...neptune.position);
-    sunCPP.set(...sun.position);
+    sunCPP.set(...testSun.sun.position);
 
-    welcomeCOPSpherical.set(sunRadius * 6, PI / 2.05, PI / 100);
+    welcomeCOPSpherical.set(testSun.radius * 6, PI / 2.05, PI / 100);
     mercuryCOPSpherical.set(mercuryRadius * 6, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 6, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 6, PI / 2.1, PI * 0.8);
@@ -492,7 +397,7 @@ function mobileMediaChange(mediaQuery) {
     saturnCOPSpherical.set(saturnRadius * 6, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 6, PI / 2.1, PI * (-0.2));
     neptuneCOPSpherical.set(neptuneRadius * 6, PI / 2.1, PI * 0.5);
-    sunCOPSpherical.set(sunRadius * 6, PI / 2, 5 * PI / 4);
+    sunCOPSpherical.set(testSun.radius * 6, PI / 2, 5 * PI / 4);
 
     onScrollAnimation();
 
@@ -539,9 +444,9 @@ function mobileMediaChange(mediaQuery) {
       neptune.position.y + neptuneCPPOffset.y,
       neptune.position.z + neptuneCPPOffset.z
     );
-    sunCPP.set(...sun.position);
+    sunCPP.set(...testSun.sun.position);
 
-    welcomeCOPSpherical.set(sunRadius * 5, PI / 2.005, PI / 1000);
+    welcomeCOPSpherical.set(testSun.radius * 5, PI / 2.005, PI / 1000);
     mercuryCOPSpherical.set(mercuryRadius * 3, PI / 2.1, PI * 0.8);
     venusCOPSpherical.set(venusRadius * 3, PI / 2.1, PI * 1.4);
     earthCOPSpherical.set(earthRadius * 3, PI / 2.1, PI * 0.8);
@@ -550,7 +455,7 @@ function mobileMediaChange(mediaQuery) {
     saturnCOPSpherical.set(saturnRadius * 3, PI / 2.1, PI * 1);
     uranusCOPSpherical.set(uranusRadius * 3, PI / 2.1, PI * (-0.2));
     neptuneCOPSpherical.set(neptuneRadius * 3, PI / 2.1, PI * 0.5);
-    sunCOPSpherical.set(sunRadius * 3, PI / 2, 5 * PI / 4);
+    sunCOPSpherical.set(testSun.radius * 3, PI / 2, 5 * PI / 4);
 
     onScrollAnimation();
 
@@ -568,14 +473,11 @@ function animation() {
 
   const timeDelta = clock.getDelta();
 
-  cubeCamera.update(renderer, offScene);
-  perlinMaterial.uniforms.time.value = clock.elapsedTime;
-  sunMaterial.uniforms.time.value = clock.elapsedTime;
-  sunMaterial.uniforms.uPerlin.value = cubeRenderTarget.texture;
+  testSun.update(renderer, clock.elapsedTime)
 
   stars.rotateY(- timeDelta * 0.02);
 
-  coronaMesh.lookAt(camera.position);
+  testSun.corona.lookAt(camera.position);
 
   mercuryMesh.rotateY(timeDelta * 0.1);
   venusMesh.rotateY(timeDelta * 0.1);
