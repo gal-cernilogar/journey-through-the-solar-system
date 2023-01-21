@@ -22,7 +22,7 @@ import Sun from '/modules/sun.js';
 
 // INIT //
 
-const welcomeSection = document.querySelector('#welcome');
+// const welcomeSection = document.querySelector('#welcome');
 const mercurySection = document.querySelector('#mercury');
 const venusSection = document.querySelector('#venus');
 const earthSection = document.querySelector('#earth');
@@ -310,7 +310,7 @@ saturnRingMesh.rotation.x = PI / 2;
 saturnMesh.add(saturnRingMesh);
 
 const saturnCPP = new THREE.Vector3();
-const saturnCPPOffset = new THREE.Vector3().setFromSphericalCoords(saturnRadius, PI / 2, saturnSpherical.theta - PI / 2);;
+const saturnCPPOffset = new THREE.Vector3().setFromSphericalCoords(saturnRadius, PI / 2, saturnSpherical.theta - PI / 2);
 const saturnCOPSpherical = new THREE.Spherical();
 
 // Uranus
@@ -327,7 +327,7 @@ uranusMesh.rotation.y = - PI / 4;
 scene.add(uranus);
 
 const uranusCPP = new THREE.Vector3();
-const uranusCPPOffset = new THREE.Vector3().setFromSphericalCoords(uranusRadius, PI / 2, uranusSpherical.theta + PI / 2);;
+const uranusCPPOffset = new THREE.Vector3().setFromSphericalCoords(uranusRadius, PI / 2, uranusSpherical.theta + PI / 2);
 const uranusCOPSpherical = new THREE.Spherical();
 
 // Neptune
@@ -342,7 +342,7 @@ neptune.position.setFromSpherical(neptuneSpherical);
 scene.add(neptune);
 
 const neptuneCPP = new THREE.Vector3();
-const neptuneCPPOffset = new THREE.Vector3().setFromSphericalCoords(neptuneRadius, PI / 2, neptuneSpherical.theta - PI / 2);;
+const neptuneCPPOffset = new THREE.Vector3().setFromSphericalCoords(neptuneRadius, PI / 2, neptuneSpherical.theta - PI / 2);
 const neptuneCOPSpherical = new THREE.Spherical();
 
 

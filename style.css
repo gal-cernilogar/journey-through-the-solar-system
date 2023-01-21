@@ -226,6 +226,7 @@ li {
 .source a {
   color: rgba(255, 255, 255, 0.3);
 }
+
 .source a:hover {
   color: white;
 }
@@ -235,6 +236,7 @@ section#quiz {
 }
 
 @media (min-width: 1024px) {
+
   header,
   footer {
     padding: 2em 2em;
