@@ -48,6 +48,7 @@ section {
   width: 100%;
   min-height: 100vh;
   padding: 0 1em;
+  pointer-events: none;
 }
 
 h2 {
@@ -137,6 +138,7 @@ li {
   background-color: rgba(77, 77, 77, 0.5);
   backdrop-filter: saturate(180%) blur(7px);
   -webkit-backdrop-filter: saturate(180%) blur(7px);
+  pointer-events: auto;
 }
 
 /* .card > *:not(img) {
