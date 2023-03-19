@@ -1,29 +1,17 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { PI, acos, random, easeInOutQuint } from "./modules/math.js";
-
-
-// import starsTextureURL from '/images/textures/2k_stars.jpg';
-import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
-import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
-import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
-import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
-import cloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
-import moonTextureURL from '/images/textures/2k_moon-optimized.jpg';
-import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
-import jupiterTextureURL from '/images/textures/2k_jupiter-optimized.jpg';
-import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
-import saturnRingTextureURL from '/images/textures/2k_saturn_ring_alpha.png';
-import uranusTextureURL from '/images/textures/2k_uranus-optimized.jpg';
-import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { PI, acos, random, easeInOutQuint } from "/modules/math.js";
 import Sun from '/modules/sun.js';
-import Planet from './modules/planet.js';
+import Planet from '/modules/planet.js';
+import PlanetWithClouds from '/modules/planetWithClouds.js';
+import PlanetWithRing from '/modules/planetWithRing.js';
 
 
 
 // INIT //
 
 // const welcomeSection = document.querySelector('#welcome');
+const mercurySection = document.querySelector('#mercury');
 const venusSection = document.querySelector('#venus');
 const earthSection = document.querySelector('#earth');
 const marsSection = document.querySelector('#mars');
@@ -48,37 +36,8 @@ const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
 const scalingFactor = 10;
 
-const venusRadius = 0.0087 * scalingFactor;
-const earthRadius = 0.0091 * scalingFactor;
-const moonRadius = 0.0025 * scalingFactor;
-const marsRadius = 0.0049 * scalingFactor;
-const jupiterRadius = 0.1004 * scalingFactor;
-const saturnRadius = 0.0836 * scalingFactor;
-const uranusRadius = 0.0364 * scalingFactor;
-const neptuneRadius = 0.0354 * scalingFactor;
-
-const venusSunDist = 80 / scalingFactor;
-const earthSunDist = 110 / scalingFactor;
-const moonEarthDist = 0.5637;
-const marsSunDist = 150 / scalingFactor;
-const jupiterSunDist = 535 / scalingFactor;
-const saturnSunDist = 1060 / scalingFactor;
-const uranusSunDist = 2115 / scalingFactor;
-const neptuneSunDist = 3215 / scalingFactor;
-
 let sphereSegments;
-let sphereSegmentsHor;
-let sphereSegmentsVer;
-
-if (mobile.matches) {
-  sphereSegments = 32;
-  sphereSegmentsHor = 32;
-  sphereSegmentsVer = sphereSegmentsHor / 2;
-} else {
-  sphereSegments = 64;
-  sphereSegmentsHor = 64;
-  sphereSegmentsVer = sphereSegmentsHor / 2;
-}
+mobile.matches ? sphereSegments = 32 : sphereSegments = 64;
 
 const clock = new THREE.Clock();
 const mouse = {
@@ -126,22 +85,7 @@ function permissionHandler() {
 
 permissionBtn.addEventListener('click', permissionHandler);
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 2000);
-const cameraFocus = new THREE.Vector3();
-const cameraPosition = new THREE.Vector3();
-
-const scene = new THREE.Scene();
-
 // Stars
-// const starsTexture = new THREE.TextureLoader().load(starsTextureURL);
-// const starsMaterial = new THREE.MeshBasicMaterial({
-//   map: starsTexture,
-//   side: THREE.BackSide
-// });
-// const starsGeometry = new THREE.BoxBufferGeometry(1000, 500, 1000);
-// const stars = new THREE.Mesh(starsGeometry, starsMaterial);
-// scene.add(stars);
-
 const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
 const starsGeometry = new THREE.BufferGeometry();
 
@@ -165,344 +109,230 @@ function createStars() {
 createStars();
 
 const stars = new THREE.Points(starsGeometry, starsMaterial);
-scene.add(stars);
 
-const testSun = new Sun(1, 64);
-scene.add(testSun.corona, testSun.sun);
+const sun = new Sun(1, 64);
 
-const welcomecameraPosition = new THREE.Spherical();
-
-// Mercury
-const mercurySection = document.querySelector('#mercury');
-const mercuryRadius = 0.0035 * scalingFactor;
-const mercurySunDist = 49 / scalingFactor;
-const mercuryPosition = new THREE.Spherical(mercurySunDist, PI / 2, - PI / 300);
-const mercury = new Planet(mercuryRadius, sphereSegments, mercuryPosition, mercuryTextureURL);
-scene.add(mercury.planet);
-
-// Venus
-const venusTexture = new THREE.TextureLoader().load(venusTextureURL);
-const venusMaterial = new THREE.MeshPhongMaterial({ map: venusTexture, shininess: 0 });
-const venusGeometry = new THREE.SphereBufferGeometry(venusRadius, sphereSegmentsHor, sphereSegmentsVer);
-const venusMesh = new THREE.Mesh(venusGeometry, venusMaterial);
-const venusSpherical = new THREE.Spherical(venusSunDist, PI / 2, PI / 4);
-const venus = new THREE.Object3D();
-venus.add(venusMesh);
-venus.position.setFromSpherical(venusSpherical);
-scene.add(venus);
-
-const venuscameraFocus = new THREE.Vector3();
-const venuscameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(venusRadius, PI / 2, venusSpherical.theta - PI / 2);
-const venuscameraPosition = new THREE.Spherical();
-
-// Earth
-const earthTexture = new THREE.TextureLoader().load(earthTextureURL);
-const earthSpecularMap = new THREE.TextureLoader().load(earthSpecularMapURL);
-const earthMaterial = new THREE.MeshPhongMaterial({
-  map: earthTexture,
-  specularMap: earthSpecularMap
+const mercury = new Planet({
+  radius: 0.0035 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(49 / scalingFactor, PI / 2, - PI / 300),
+  textureURL: '/images/textures/2k_mercury-optimized.jpg'
 });
-const earthGeometry = new THREE.SphereBufferGeometry(earthRadius, sphereSegmentsHor, sphereSegmentsVer);
-const earthMesh = new THREE.Mesh(earthGeometry, earthMaterial);
-const earthSpherical = new THREE.Spherical(earthSunDist, PI / 2, 0);
-const earth = new THREE.Object3D();
-earth.add(earthMesh);
-earth.position.setFromSpherical(earthSpherical);
-scene.add(earth);
 
-const cloudsTexture = new THREE.TextureLoader().load(cloudsTextureURL);
-const cloudsMaterial = new THREE.MeshPhongMaterial({
-  map: cloudsTexture,
-  opacity: 0.5,
-  transparent: true,
-  blending: THREE.AdditiveBlending,
-  shininess: 0
+const venus = new Planet({
+  radius: 0.0087 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(80 / scalingFactor, PI / 2, PI / 4),
+  textureURL: '/images/textures/2k_venus_surface-optimized.jpg',
+  shininess: null
 });
-const cloudsGeometry = new THREE.SphereBufferGeometry(earthRadius * 1.01, sphereSegmentsHor, sphereSegmentsVer);
-const cloudsMesh = new THREE.Mesh(cloudsGeometry, cloudsMaterial);
-earthMesh.add(cloudsMesh);
 
-const earthcameraFocus = new THREE.Vector3();
-const earthcameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(earthRadius, PI / 2, earthSpherical.theta + PI / 2);
-const earthcameraPosition = new THREE.Spherical(0.03, PI / 2.1, PI * 0.8);
-
-// The Moon
-const moonTexture = new THREE.TextureLoader().load(moonTextureURL);
-const moonMaterial = new THREE.MeshPhongMaterial({ map: moonTexture, shininess: 0 });
-const moonGeometry = new THREE.SphereBufferGeometry(moonRadius, sphereSegmentsHor, sphereSegmentsVer);
-const moonMesh = new THREE.Mesh(moonGeometry, moonMaterial);
-const moonSpherical = new THREE.Spherical(moonEarthDist, PI / 2, 0);
-moonMesh.position.setFromSpherical(moonSpherical);
-moonMesh.rotation.y = PI / 2;
-earthMesh.add(moonMesh);
-
-// Mars
-const marsTexture = new THREE.TextureLoader().load(marsTextureURL);
-const marsMaterial = new THREE.MeshPhongMaterial({ map: marsTexture, shininess: 0 });
-const marsGeometry = new THREE.SphereBufferGeometry(marsRadius, sphereSegmentsHor, sphereSegmentsVer);
-const marsMesh = new THREE.Mesh(marsGeometry, marsMaterial);
-const marsSpherical = new THREE.Spherical(marsSunDist, PI / 2, PI / 2);
-const mars = new THREE.Object3D();
-mars.add(marsMesh);
-mars.position.setFromSpherical(marsSpherical);
-scene.add(mars);
-
-const marscameraFocus = new THREE.Vector3();
-const marscameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(marsRadius, PI / 2, marsSpherical.theta - PI / 2);
-const marscameraPosition = new THREE.Spherical();
-
-// Jupiter
-const jupiterTexture = new THREE.TextureLoader().load(jupiterTextureURL);
-const jupiterMaterial = new THREE.MeshPhongMaterial({ map: jupiterTexture, shininess: 0 });
-const jupiterGeometry = new THREE.SphereBufferGeometry(jupiterRadius, sphereSegmentsHor, sphereSegmentsVer);
-const jupiterMesh = new THREE.Mesh(jupiterGeometry, jupiterMaterial);
-const jupiterSpherical = new THREE.Spherical(jupiterSunDist, PI / 2, - PI / 2);
-const jupiter = new THREE.Object3D();
-jupiter.add(jupiterMesh);
-jupiter.position.setFromSpherical(jupiterSpherical);
-scene.add(jupiter);
-
-const jupitercameraFocus = new THREE.Vector3();
-const jupitercameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(jupiterRadius, PI / 2, jupiterSpherical.theta + PI / 2);
-const jupitercameraPosition = new THREE.Spherical();
-
-// Saturn
-const saturnTexture = new THREE.TextureLoader().load(saturnTextureURL);
-const saturnMaterial = new THREE.MeshPhongMaterial({ map: saturnTexture, shininess: 0 });
-const saturnGeometry = new THREE.SphereBufferGeometry(saturnRadius, sphereSegmentsHor, sphereSegmentsVer);
-const saturnMesh = new THREE.Mesh(saturnGeometry, saturnMaterial);
-const saturnSpherical = new THREE.Spherical(saturnSunDist, PI / 2, - PI / 4);
-const saturn = new THREE.Object3D();
-saturn.add(saturnMesh);
-saturn.position.setFromSpherical(saturnSpherical);
-saturnMesh.rotation.z = PI * 0.1485;
-saturnMesh.rotation.y = - PI * 0.1485;
-scene.add(saturn);
-
-const saturnRingTexture = new THREE.TextureLoader().load(saturnRingTextureURL);
-const saturnRingMaterial = new THREE.MeshBasicMaterial({
-  map: saturnRingTexture,
-  color: 0xffffff,
-  side: THREE.DoubleSide,
-  transparent: true
+const earth = new PlanetWithClouds({
+  radius: 0.0091 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(110 / scalingFactor, PI / 2, 0),
+  textureURL: '/images/textures/2k_earth_daymap-optimized.jpg',
+  specularMapURL: '/images/textures/2k_earth_specular_map-optimized.jpg',
+  cloudsTextureURL: '/images/textures/2k_earth_clouds-optimized.jpg',
+  cloudsOpacity: 0.5
 });
-const saturnRingGeometry = new THREE.RingBufferGeometry(saturnRadius * 1.3062, saturnRadius * 2.2859, sphereSegmentsHor);
-const pos = saturnRingGeometry.attributes.position;
-const v3 = new THREE.Vector3();
-for (let i = 0; i < pos.count; i++) {
-  v3.fromBufferAttribute(pos, i);
-  saturnRingGeometry.attributes.uv.setXY(i, v3.length() < saturnRadius * 1.79605 ? 0 : 1, 1);
-}
-const saturnRingMesh = new THREE.Mesh(saturnRingGeometry, saturnRingMaterial);
-saturnRingMesh.rotation.x = PI / 2;
-saturnMesh.add(saturnRingMesh);
 
-const saturncameraFocus = new THREE.Vector3();
-const saturncameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(saturnRadius, PI / 2, saturnSpherical.theta - PI / 2);
-const saturncameraPosition = new THREE.Spherical();
+const moon = new Planet({
+  radius: 0.0025 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: earth.sphericalPosition,
+  textureURL: '/images/textures/2k_moon-optimized.jpg',
+  shininess: null
+});
+moon.mesh.position.setFromSphericalCoords(0.5637, PI / 2, 0);
+moon.mesh.rotation.y = PI / 2;
 
-// Uranus
-const uranusTexture = new THREE.TextureLoader().load(uranusTextureURL);
-const uranusMaterial = new THREE.MeshPhongMaterial({ map: uranusTexture, shininess: 0 });
-const uranusGeometry = new THREE.SphereBufferGeometry(uranusRadius, sphereSegmentsHor, sphereSegmentsVer);
-const uranusMesh = new THREE.Mesh(uranusGeometry, uranusMaterial);
-const uranusSpherical = new THREE.Spherical(uranusSunDist, PI / 2, PI);
-const uranus = new THREE.Object3D();
-uranus.add(uranusMesh);
-uranus.position.setFromSpherical(uranusSpherical);
-uranusMesh.rotation.z = - PI / 2;
-uranusMesh.rotation.y = - PI / 4;
-scene.add(uranus);
+const mars = new Planet({
+  radius: 0.0049 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(150 / scalingFactor, PI / 2, PI / 2),
+  textureURL: '/images/textures/2k_mars-optimized.jpg'
+});
 
-const uranuscameraFocus = new THREE.Vector3();
-const uranuscameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(uranusRadius, PI / 2, uranusSpherical.theta + PI / 2);
-const uranuscameraPosition = new THREE.Spherical();
+const jupiter = new Planet({
+  radius: 0.1004 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(535 / scalingFactor, PI / 2, - PI / 2),
+  textureURL: '/images/textures/2k_jupiter-optimized.jpg',
+  shininess: null
+});
 
-// Neptune
-const neptuneTexture = new THREE.TextureLoader().load(neptuneTextureURL);
-const neptuneMaterial = new THREE.MeshPhongMaterial({ map: neptuneTexture, shininess: 0 });
-const neptuneGeometry = new THREE.SphereBufferGeometry(neptuneRadius, sphereSegmentsHor, sphereSegmentsVer);
-const neptuneMesh = new THREE.Mesh(neptuneGeometry, neptuneMaterial);
-const neptuneSpherical = new THREE.Spherical(neptuneSunDist, PI / 2, - 3 * PI / 4);
-const neptune = new THREE.Object3D();
-neptune.add(neptuneMesh);
-neptune.position.setFromSpherical(neptuneSpherical);
-scene.add(neptune);
+const saturn = new PlanetWithRing({
+  radius: 0.0836 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(1060 / scalingFactor, PI / 2, - PI / 4),
+  textureURL: '/images/textures/2k_saturn-optimized.jpg',
+  shininess: null,
+  ringTextureURL: '/images/textures/2k_saturn_ring_alpha.png'
+});
+saturn.mesh.rotation.z = PI * 0.1485;
+saturn.mesh.rotation.y = - PI * 0.1485;
+saturn.ringMesh.rotation.x = PI / 2;
 
-const neptunecameraFocus = new THREE.Vector3();
-const neptunecameraFocusOffset = new THREE.Vector3().setFromSphericalCoords(neptuneRadius, PI / 2, neptuneSpherical.theta - PI / 2);
-const neptunecameraPosition = new THREE.Spherical();
+const uranus = new Planet({
+  radius: 0.0364 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(2115 / scalingFactor, PI / 2, PI),
+  textureURL: '/images/textures/2k_uranus-optimized.jpg',
+  shininess: null
+});
+uranus.mesh.rotation.z = - PI / 2;
+uranus.mesh.rotation.y = - PI / 4;
 
+const neptune = new Planet({
+  radius: 0.0354 * scalingFactor,
+  sphereSegments,
+  sphericalPosition: new THREE.Spherical(3215 / scalingFactor, PI / 2, - 3 * PI / 4),
+  textureURL: '/images/textures/2k_neptune-optimized.jpg',
+  shininess: null
+});
 
-
-// Helpers
 /* const gridHelper = new THREE.GridHelper(10, 50);
 scene.add(gridHelper); */
 
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 2000);
+const cameraFocus = new THREE.Vector3();
+const cameraPosition = new THREE.Vector3();
+const welcomecameraPosition = new THREE.Spherical();
 
+const scene = new THREE.Scene();
+scene.add(stars, sun.corona, sun.object, mercury.object, venus.object, earth.object, moon.object, mars.object, jupiter.object, saturn.object, uranus.object, neptune.object);
 
-// Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.physicallyCorrectLights = false;
-renderer.setAnimationLoop(animation);
+renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
 
-
-
-// Controls
-const controls = new OrbitControls(camera, renderer.domElement);
+// const controls = new OrbitControls(camera, renderer.domElement);
 /* controls.autoRotate = false;
 controls.autoRotateSpeed = -0.5; */
 
-
-
-// MEDIA QUERY //
-
-function mobileMediaChange(mediaQuery) {
-
+function handleMediaChange(mediaQuery) {
   if (mediaQuery.matches) {
+    mercury.cameraFocus.set(...mercury.object.position);
+    venus.cameraFocus.set(...venus.object.position);
+    earth.cameraFocus.set(...earth.object.position);
+    mars.cameraFocus.set(...mars.object.position);
+    jupiter.cameraFocus.set(...jupiter.object.position);
+    saturn.cameraFocus.set(...saturn.object.position);
+    uranus.cameraFocus.set(...uranus.object.position);
+    neptune.cameraFocus.set(...neptune.object.position);
+    sun.cameraFocus.set(...sun.object.position);
 
-    // If media query matches
-    mercury.cameraFocus.set(...mercury.planet.position);
-    venuscameraFocus.set(...venus.position);
-    earthcameraFocus.set(...earth.position);
-    marscameraFocus.set(...mars.position);
-    jupitercameraFocus.set(...jupiter.position);
-    saturncameraFocus.set(...saturn.position);
-    uranuscameraFocus.set(...uranus.position);
-    neptunecameraFocus.set(...neptune.position);
-    testSun.cameraFocus.set(...testSun.sun.position);
-
-    welcomecameraPosition.set(testSun.radius * 6, PI / 2.05, PI / 100);
+    welcomecameraPosition.set(sun.radius * 6, PI / 2.05, PI / 100);
     mercury.cameraPosition.set(mercury.radius * 6, PI / 2.1, PI * 0.8);
-    venuscameraPosition.set(venusRadius * 6, PI / 2.1, PI * 1.4);
-    earthcameraPosition.set(earthRadius * 6, PI / 2.1, PI * 0.8);
-    marscameraPosition.set(marsRadius * 6, PI / 2.1, PI * 1.7);
-    jupitercameraPosition.set(jupiterRadius * 6, PI / 2.1, PI * 0.3);
-    saturncameraPosition.set(saturnRadius * 6, PI / 2.1, PI * 1);
-    uranuscameraPosition.set(uranusRadius * 6, PI / 2.1, PI * (-0.2));
-    neptunecameraPosition.set(neptuneRadius * 6, PI / 2.1, PI * 0.5);
-    testSun.cameraPosition.set(testSun.radius * 6, PI / 2, 5 * PI / 4);
+    venus.cameraPosition.set(venus.radius * 6, PI / 2.1, PI * 1.4);
+    earth.cameraPosition.set(earth.radius * 6, PI / 2.1, PI * 0.8);
+    mars.cameraPosition.set(mars.radius * 6, PI / 2.1, PI * 1.7);
+    jupiter.cameraPosition.set(jupiter.radius * 6, PI / 2.1, PI * 0.3);
+    saturn.cameraPosition.set(saturn.radius * 6, PI / 2.1, PI * 1);
+    uranus.cameraPosition.set(uranus.radius * 6, PI / 2.1, PI * (-0.2));
+    neptune.cameraPosition.set(neptune.radius * 6, PI / 2.1, PI * 0.5);
+    sun.cameraPosition.set(sun.radius * 6, PI / 2, 5 * PI / 4);
 
-    onScrollAnimation();
-
+    animateOnScroll();
   } else {
-
-    // If media query doesn't match
-    mercury.cameraFocus.set(...new THREE.Vector3(...mercury.planet.position).add(
-      new THREE.Vector3().setFromSphericalCoords(mercuryRadius, PI / 2, mercuryPosition.theta + PI / 2)
+    mercury.cameraFocus.set(...new THREE.Vector3(...mercury.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(mercury.radius, PI / 2, mercury.sphericalPosition.theta + PI / 2)
     ));
-    venuscameraFocus.set(
-      venus.position.x + venuscameraFocusOffset.x,
-      venus.position.y + venuscameraFocusOffset.y,
-      venus.position.z + venuscameraFocusOffset.z
-    );
-    earthcameraFocus.set(
-      earth.position.x + earthcameraFocusOffset.x,
-      earth.position.y + earthcameraFocusOffset.y,
-      earth.position.z + earthcameraFocusOffset.z
-    );
-    marscameraFocus.set(
-      mars.position.x + marscameraFocusOffset.x,
-      mars.position.y + marscameraFocusOffset.y,
-      mars.position.z + marscameraFocusOffset.z
-    );
-    jupitercameraFocus.set(
-      jupiter.position.x + jupitercameraFocusOffset.x,
-      jupiter.position.y + jupitercameraFocusOffset.y,
-      jupiter.position.z + jupitercameraFocusOffset.z
-    );
-    saturncameraFocus.set(
-      saturn.position.x + saturncameraFocusOffset.x,
-      saturn.position.y + saturncameraFocusOffset.y,
-      saturn.position.z + saturncameraFocusOffset.z
-    );
-    uranuscameraFocus.set(
-      uranus.position.x + uranuscameraFocusOffset.x,
-      uranus.position.y + uranuscameraFocusOffset.y,
-      uranus.position.z + uranuscameraFocusOffset.z
-    );
-    neptunecameraFocus.set(
-      neptune.position.x + neptunecameraFocusOffset.x,
-      neptune.position.y + neptunecameraFocusOffset.y,
-      neptune.position.z + neptunecameraFocusOffset.z
-    );
-    testSun.cameraFocus.set(...testSun.sun.position);
+    venus.cameraFocus.set(...new THREE.Vector3(...venus.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(venus.radius, PI / 2, venus.sphericalPosition.theta - PI / 2)
+    ));
+    earth.cameraFocus.set(...new THREE.Vector3(...earth.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(earth.radius, PI / 2, earth.sphericalPosition.theta + PI / 2)
+    ));
+    mars.cameraFocus.set(...new THREE.Vector3(...mars.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(mars.radius, PI / 2, mars.sphericalPosition.theta - PI / 2)
+    ));
+    jupiter.cameraFocus.set(...new THREE.Vector3(...jupiter.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(jupiter.radius, PI / 2, jupiter.sphericalPosition.theta + PI / 2)
+    ));
+    saturn.cameraFocus.set(...new THREE.Vector3(...saturn.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(saturn.radius, PI / 2, saturn.sphericalPosition.theta - PI / 2)
+    ));
+    uranus.cameraFocus.set(...new THREE.Vector3(...uranus.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(uranus.radius, PI / 2, uranus.sphericalPosition.theta + PI / 2)
+    ));
+    neptune.cameraFocus.set(...new THREE.Vector3(...neptune.object.position).add(
+      new THREE.Vector3().setFromSphericalCoords(neptune.radius, PI / 2, neptune.sphericalPosition.theta - PI / 2)
+    ));
+    sun.cameraFocus.set(...sun.object.position);
 
-    welcomecameraPosition.set(testSun.radius * 5, PI / 2.005, PI / 1000);
+    welcomecameraPosition.set(sun.radius * 5, PI / 2.005, PI / 1000);
     mercury.cameraPosition.set(mercury.radius * 3, PI / 2.1, PI * 0.8);
-    venuscameraPosition.set(venusRadius * 3, PI / 2.1, PI * 1.4);
-    earthcameraPosition.set(earthRadius * 3, PI / 2.1, PI * 0.8);
-    marscameraPosition.set(marsRadius * 3, PI / 2.1, PI * 1.7);
-    jupitercameraPosition.set(jupiterRadius * 3, PI / 2.1, PI * 0.3);
-    saturncameraPosition.set(saturnRadius * 3, PI / 2.1, PI * 1);
-    uranuscameraPosition.set(uranusRadius * 3, PI / 2.1, PI * (-0.2));
-    neptunecameraPosition.set(neptuneRadius * 3, PI / 2.1, PI * 0.5);
-    testSun.cameraPosition.set(testSun.radius * 3, PI / 2, 5 * PI / 4);
+    venus.cameraPosition.set(venus.radius * 3, PI / 2.1, PI * 1.4);
+    earth.cameraPosition.set(earth.radius * 3, PI / 2.1, PI * 0.8);
+    mars.cameraPosition.set(mars.radius * 3, PI / 2.1, PI * 1.7);
+    jupiter.cameraPosition.set(jupiter.radius * 3, PI / 2.1, PI * 0.3);
+    saturn.cameraPosition.set(saturn.radius * 3, PI / 2.1, PI * 1);
+    uranus.cameraPosition.set(uranus.radius * 3, PI / 2.1, PI * (-0.2));
+    neptune.cameraPosition.set(neptune.radius * 3, PI / 2.1, PI * 0.5);
+    sun.cameraPosition.set(sun.radius * 3, PI / 2, 5 * PI / 4);
 
-    onScrollAnimation();
-
+    animateOnScroll();
   }
-
 }
 
-mobileMediaChange(mobile);
+handleMediaChange(mobile);
 
 
 
-// ANIMATION //
-
-function animation() {
+function animate() {
 
   const timeDelta = clock.getDelta();
 
   stars.rotateY(- timeDelta * 0.02);
 
-  testSun.update(renderer, clock.elapsedTime);
-  testSun.corona.lookAt(camera.position);
+  sun.update(renderer, clock.elapsedTime);
+  sun.corona.lookAt(camera.position);
 
   mercury.mesh.rotateY(timeDelta * 0.1);
-  venusMesh.rotateY(timeDelta * 0.1);
-  earthMesh.rotateY(timeDelta * 0.1);
-  marsMesh.rotateY(timeDelta * 0.1);
-  jupiterMesh.rotateY(timeDelta * 0.1);
-  saturnMesh.rotateY(timeDelta * 0.1);
-  uranusMesh.rotateY(timeDelta * (- 0.1));
-  neptuneMesh.rotateY(timeDelta * 0.1);
+  venus.mesh.rotateY(timeDelta * 0.1);
+  earth.mesh.rotateY(timeDelta * 0.1);
+  moon.mesh.rotateY(timeDelta * 0.1 / 27);
+  moon.object.rotateY(timeDelta * 0.1 / 27);
+  mars.mesh.rotateY(timeDelta * 0.1);
+  jupiter.mesh.rotateY(timeDelta * 0.1);
+  saturn.mesh.rotateY(timeDelta * 0.1);
+  uranus.mesh.rotateY(timeDelta * (- 0.1));
+  neptune.mesh.rotateY(timeDelta * 0.1);
 
-  mercury.planet.rotation.y = mouse.x / 2;
-  venus.rotation.y = mouse.x / 2;
-  earth.rotation.y = mouse.x / 2;
-  mars.rotation.y = mouse.x / 2;
-  jupiter.rotation.y = mouse.x / 2;
-  saturn.rotation.y = mouse.x / 2;
-  uranus.rotation.y = mouse.x / 2;
-  neptune.rotation.y = mouse.x / 2;
+  mercury.object.rotation.y = mouse.x / 2;
+  venus.object.rotation.y = mouse.x / 2;
+  earth.object.rotation.y = mouse.x / 2;
+  mars.object.rotation.y = mouse.x / 2;
+  jupiter.object.rotation.y = mouse.x / 2;
+  saturn.object.rotation.y = mouse.x / 2;
+  uranus.object.rotation.y = mouse.x / 2;
+  neptune.object.rotation.y = mouse.x / 2;
 
-  controls.target.set(...cameraFocus);
-  controls.update();
-  // camera.lookAt(...cameraFocus);
+  // controls.target.set(...cameraFocus);
+  // controls.update();
+  camera.lookAt(...cameraFocus);
 
   renderer.render(scene, camera);
 
 }
 
-animation();
+animate();
 
 
 
-// ON SCROLL ANIMATION //
-
-function onScrollAnimation() {
+function animateOnScroll() {
 
   const s = window.pageYOffset;
 
   // Init
   if (s === 0) {
-    cameraFocus.set(...testSun.cameraFocus);
+    cameraFocus.set(...sun.cameraFocus);
     cameraPosition.setFromSpherical(welcomecameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
@@ -552,22 +382,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      mercury.cameraFocus.x + (venuscameraFocus.x - mercury.cameraFocus.x) * easeInOutQuint((s - start) / interval),
-      mercury.cameraFocus.y + (venuscameraFocus.y - mercury.cameraFocus.y) * easeInOutQuint((s - start) / interval),
-      mercury.cameraFocus.z + (venuscameraFocus.z - mercury.cameraFocus.z) * easeInOutQuint((s - start) / interval)
+      mercury.cameraFocus.x + (venus.cameraFocus.x - mercury.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      mercury.cameraFocus.y + (venus.cameraFocus.y - mercury.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      mercury.cameraFocus.z + (venus.cameraFocus.z - mercury.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
         mercury.cameraPosition.radius + 10 * easeInOutQuint((s - start) / interval),
-        mercury.cameraPosition.phi + (venuscameraPosition.phi - mercury.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        mercury.cameraPosition.theta + (venuscameraPosition.theta - mercury.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        mercury.cameraPosition.phi + (venus.cameraPosition.phi - mercury.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        mercury.cameraPosition.theta + (venus.cameraPosition.theta - mercury.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (mercury.cameraPosition.radius + 10) + venuscameraPosition.radius - (mercury.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
-        mercury.cameraPosition.phi + (venuscameraPosition.phi - mercury.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        mercury.cameraPosition.theta + (venuscameraPosition.theta - mercury.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (mercury.cameraPosition.radius + 10) + venus.cameraPosition.radius - (mercury.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
+        mercury.cameraPosition.phi + (venus.cameraPosition.phi - mercury.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        mercury.cameraPosition.theta + (venus.cameraPosition.theta - mercury.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -581,8 +411,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toVenusSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + venusSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...venuscameraFocus);
-    cameraPosition.setFromSpherical(venuscameraPosition);
+    cameraFocus.set(...venus.cameraFocus);
+    cameraPosition.setFromSpherical(venus.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -596,22 +426,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      venuscameraFocus.x + (earthcameraFocus.x - venuscameraFocus.x) * easeInOutQuint((s - start) / interval),
-      venuscameraFocus.y + (earthcameraFocus.y - venuscameraFocus.y) * easeInOutQuint((s - start) / interval),
-      venuscameraFocus.z + (earthcameraFocus.z - venuscameraFocus.z) * easeInOutQuint((s - start) / interval)
+      venus.cameraFocus.x + (earth.cameraFocus.x - venus.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      venus.cameraFocus.y + (earth.cameraFocus.y - venus.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      venus.cameraFocus.z + (earth.cameraFocus.z - venus.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        venuscameraPosition.radius + 10 * easeInOutQuint((s - start) / interval),
-        venuscameraPosition.phi + (earthcameraPosition.phi - venuscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        venuscameraPosition.theta + (earthcameraPosition.theta - venuscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        venus.cameraPosition.radius + 10 * easeInOutQuint((s - start) / interval),
+        venus.cameraPosition.phi + (earth.cameraPosition.phi - venus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        venus.cameraPosition.theta + (earth.cameraPosition.theta - venus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (venuscameraPosition.radius + 10) + earthcameraPosition.radius - (venuscameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
-        venuscameraPosition.phi + (earthcameraPosition.phi - venuscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        venuscameraPosition.theta + (earthcameraPosition.theta - venuscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (venus.cameraPosition.radius + 10) + earth.cameraPosition.radius - (venus.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
+        venus.cameraPosition.phi + (earth.cameraPosition.phi - venus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        venus.cameraPosition.theta + (earth.cameraPosition.theta - venus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -625,8 +455,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toEarthSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + earthSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...earthcameraFocus);
-    cameraPosition.setFromSpherical(earthcameraPosition);
+    cameraFocus.set(...earth.cameraFocus);
+    cameraPosition.setFromSpherical(earth.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -640,22 +470,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      earthcameraFocus.x + (marscameraFocus.x - earthcameraFocus.x) * easeInOutQuint((s - start) / interval),
-      earthcameraFocus.y + (marscameraFocus.y - earthcameraFocus.y) * easeInOutQuint((s - start) / interval),
-      earthcameraFocus.z + (marscameraFocus.z - earthcameraFocus.z) * easeInOutQuint((s - start) / interval)
+      earth.cameraFocus.x + (mars.cameraFocus.x - earth.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      earth.cameraFocus.y + (mars.cameraFocus.y - earth.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      earth.cameraFocus.z + (mars.cameraFocus.z - earth.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        earthcameraPosition.radius + 10 * easeInOutQuint((s - start) / interval),
-        earthcameraPosition.phi + (marscameraPosition.phi - earthcameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        earthcameraPosition.theta + (marscameraPosition.theta - earthcameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        earth.cameraPosition.radius + 10 * easeInOutQuint((s - start) / interval),
+        earth.cameraPosition.phi + (mars.cameraPosition.phi - earth.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        earth.cameraPosition.theta + (mars.cameraPosition.theta - earth.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (earthcameraPosition.radius + 10) + marscameraPosition.radius - (earthcameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
-        earthcameraPosition.phi + (marscameraPosition.phi - earthcameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        earthcameraPosition.theta + (marscameraPosition.theta - earthcameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (earth.cameraPosition.radius + 10) + mars.cameraPosition.radius - (earth.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
+        earth.cameraPosition.phi + (mars.cameraPosition.phi - earth.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        earth.cameraPosition.theta + (mars.cameraPosition.theta - earth.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -669,8 +499,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toMarsSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + marsSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...marscameraFocus);
-    cameraPosition.setFromSpherical(marscameraPosition);
+    cameraFocus.set(...mars.cameraFocus);
+    cameraPosition.setFromSpherical(mars.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -684,22 +514,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      marscameraFocus.x + (jupitercameraFocus.x - marscameraFocus.x) * easeInOutQuint((s - start) / interval),
-      marscameraFocus.y + (jupitercameraFocus.y - marscameraFocus.y) * easeInOutQuint((s - start) / interval),
-      marscameraFocus.z + (jupitercameraFocus.z - marscameraFocus.z) * easeInOutQuint((s - start) / interval)
+      mars.cameraFocus.x + (jupiter.cameraFocus.x - mars.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      mars.cameraFocus.y + (jupiter.cameraFocus.y - mars.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      mars.cameraFocus.z + (jupiter.cameraFocus.z - mars.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        marscameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
-        marscameraPosition.phi + (jupitercameraPosition.phi - marscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        marscameraPosition.theta + (jupitercameraPosition.theta - marscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        mars.cameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
+        mars.cameraPosition.phi + (jupiter.cameraPosition.phi - mars.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        mars.cameraPosition.theta + (jupiter.cameraPosition.theta - mars.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (marscameraPosition.radius + 100) + jupitercameraPosition.radius - (marscameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
-        marscameraPosition.phi + (jupitercameraPosition.phi - marscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        marscameraPosition.theta + (jupitercameraPosition.theta - marscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (mars.cameraPosition.radius + 100) + jupiter.cameraPosition.radius - (mars.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
+        mars.cameraPosition.phi + (jupiter.cameraPosition.phi - mars.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        mars.cameraPosition.theta + (jupiter.cameraPosition.theta - mars.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -713,8 +543,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toJupiterSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + jupiterSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...jupitercameraFocus);
-    cameraPosition.setFromSpherical(jupitercameraPosition);
+    cameraFocus.set(...jupiter.cameraFocus);
+    cameraPosition.setFromSpherical(jupiter.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -728,22 +558,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      jupitercameraFocus.x + (saturncameraFocus.x - jupitercameraFocus.x) * easeInOutQuint((s - start) / interval),
-      jupitercameraFocus.y + (saturncameraFocus.y - jupitercameraFocus.y) * easeInOutQuint((s - start) / interval),
-      jupitercameraFocus.z + (saturncameraFocus.z - jupitercameraFocus.z) * easeInOutQuint((s - start) / interval)
+      jupiter.cameraFocus.x + (saturn.cameraFocus.x - jupiter.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      jupiter.cameraFocus.y + (saturn.cameraFocus.y - jupiter.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      jupiter.cameraFocus.z + (saturn.cameraFocus.z - jupiter.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        jupitercameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
-        jupitercameraPosition.phi + (saturncameraPosition.phi - jupitercameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        jupitercameraPosition.theta + (saturncameraPosition.theta - jupitercameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        jupiter.cameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
+        jupiter.cameraPosition.phi + (saturn.cameraPosition.phi - jupiter.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        jupiter.cameraPosition.theta + (saturn.cameraPosition.theta - jupiter.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (jupitercameraPosition.radius + 100) + saturncameraPosition.radius - (jupitercameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
-        jupitercameraPosition.phi + (saturncameraPosition.phi - jupitercameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        jupitercameraPosition.theta + (saturncameraPosition.theta - jupitercameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (jupiter.cameraPosition.radius + 100) + saturn.cameraPosition.radius - (jupiter.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
+        jupiter.cameraPosition.phi + (saturn.cameraPosition.phi - jupiter.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        jupiter.cameraPosition.theta + (saturn.cameraPosition.theta - jupiter.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -757,8 +587,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toSaturnSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + saturnSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...saturncameraFocus);
-    cameraPosition.setFromSpherical(saturncameraPosition);
+    cameraFocus.set(...saturn.cameraFocus);
+    cameraPosition.setFromSpherical(saturn.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -772,22 +602,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      saturncameraFocus.x + (uranuscameraFocus.x - saturncameraFocus.x) * easeInOutQuint((s - start) / interval),
-      saturncameraFocus.y + (uranuscameraFocus.y - saturncameraFocus.y) * easeInOutQuint((s - start) / interval),
-      saturncameraFocus.z + (uranuscameraFocus.z - saturncameraFocus.z) * easeInOutQuint((s - start) / interval)
+      saturn.cameraFocus.x + (uranus.cameraFocus.x - saturn.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      saturn.cameraFocus.y + (uranus.cameraFocus.y - saturn.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      saturn.cameraFocus.z + (uranus.cameraFocus.z - saturn.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        saturncameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
-        saturncameraPosition.phi + (uranuscameraPosition.phi - saturncameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        saturncameraPosition.theta + (uranuscameraPosition.theta - saturncameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        saturn.cameraPosition.radius + 100 * easeInOutQuint((s - start) / interval),
+        saturn.cameraPosition.phi + (uranus.cameraPosition.phi - saturn.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        saturn.cameraPosition.theta + (uranus.cameraPosition.theta - saturn.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (saturncameraPosition.radius + 100) + uranuscameraPosition.radius - (saturncameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
-        saturncameraPosition.phi + (uranuscameraPosition.phi - saturncameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        saturncameraPosition.theta + (uranuscameraPosition.theta - saturncameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (saturn.cameraPosition.radius + 100) + uranus.cameraPosition.radius - (saturn.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
+        saturn.cameraPosition.phi + (uranus.cameraPosition.phi - saturn.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        saturn.cameraPosition.theta + (uranus.cameraPosition.theta - saturn.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -801,8 +631,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toUranusSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + uranusSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...uranuscameraFocus);
-    cameraPosition.setFromSpherical(uranuscameraPosition);
+    cameraFocus.set(...uranus.cameraFocus);
+    cameraPosition.setFromSpherical(uranus.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -816,22 +646,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      uranuscameraFocus.x + (neptunecameraFocus.x - uranuscameraFocus.x) * easeInOutQuint((s - start) / interval),
-      uranuscameraFocus.y + (neptunecameraFocus.y - uranuscameraFocus.y) * easeInOutQuint((s - start) / interval),
-      uranuscameraFocus.z + (neptunecameraFocus.z - uranuscameraFocus.z) * easeInOutQuint((s - start) / interval)
+      uranus.cameraFocus.x + (neptune.cameraFocus.x - uranus.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      uranus.cameraFocus.y + (neptune.cameraFocus.y - uranus.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      uranus.cameraFocus.z + (neptune.cameraFocus.z - uranus.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        uranuscameraPosition.radius + 200 * easeInOutQuint((s - start) / interval),
-        uranuscameraPosition.phi + (neptunecameraPosition.phi - uranuscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        uranuscameraPosition.theta + (neptunecameraPosition.theta - uranuscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        uranus.cameraPosition.radius + 200 * easeInOutQuint((s - start) / interval),
+        uranus.cameraPosition.phi + (neptune.cameraPosition.phi - uranus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        uranus.cameraPosition.theta + (neptune.cameraPosition.theta - uranus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (uranuscameraPosition.radius + 200) + neptunecameraPosition.radius - (uranuscameraPosition.radius + 200) * easeInOutQuint((s - start) / interval),
-        uranuscameraPosition.phi + (neptunecameraPosition.phi - uranuscameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        uranuscameraPosition.theta + (neptunecameraPosition.theta - uranuscameraPosition.theta) * easeInOutQuint((s - start) / interval)
+        (uranus.cameraPosition.radius + 200) + neptune.cameraPosition.radius - (uranus.cameraPosition.radius + 200) * easeInOutQuint((s - start) / interval),
+        uranus.cameraPosition.phi + (neptune.cameraPosition.phi - uranus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        uranus.cameraPosition.theta + (neptune.cameraPosition.theta - uranus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
     camera.position.set(
@@ -845,8 +675,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toNeptuneSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + neptuneSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...neptunecameraFocus);
-    cameraPosition.setFromSpherical(neptunecameraPosition);
+    cameraFocus.set(...neptune.cameraFocus);
+    cameraPosition.setFromSpherical(neptune.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -860,22 +690,22 @@ function onScrollAnimation() {
   if (start < s && s <= end) {
     const interval = end - start;
     cameraFocus.set(
-      neptunecameraFocus.x + (testSun.cameraFocus.x - neptunecameraFocus.x) * easeInOutQuint((s - start) / interval),
-      neptunecameraFocus.y + (testSun.cameraFocus.y - neptunecameraFocus.y) * easeInOutQuint((s - start) / interval),
-      neptunecameraFocus.z + (testSun.cameraFocus.z - neptunecameraFocus.z) * easeInOutQuint((s - start) / interval)
+      neptune.cameraFocus.x + (sun.cameraFocus.x - neptune.cameraFocus.x) * easeInOutQuint((s - start) / interval),
+      neptune.cameraFocus.y + (sun.cameraFocus.y - neptune.cameraFocus.y) * easeInOutQuint((s - start) / interval),
+      neptune.cameraFocus.z + (sun.cameraFocus.z - neptune.cameraFocus.z) * easeInOutQuint((s - start) / interval)
     );
     if (start < s && s <= start + interval / 2) {
       cameraPosition.setFromSphericalCoords(
-        neptunecameraPosition.radius + 0 * easeInOutQuint((s - start) / interval),
-        neptunecameraPosition.phi + (testSun.cameraPosition.phi - neptunecameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        neptunecameraPosition.theta + (testSun.cameraPosition.theta - neptunecameraPosition.theta) * easeInOutQuint((s - start) / interval * 2)
+        neptune.cameraPosition.radius + 0 * easeInOutQuint((s - start) / interval),
+        neptune.cameraPosition.phi + (sun.cameraPosition.phi - neptune.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        neptune.cameraPosition.theta + (sun.cameraPosition.theta - neptune.cameraPosition.theta) * easeInOutQuint((s - start) / interval * 2)
       );
     }
     if (start + interval / 2 < s && s <= end) {
       cameraPosition.setFromSphericalCoords(
-        (neptunecameraPosition.radius + 0) + testSun.cameraPosition.radius - (neptunecameraPosition.radius + 0) * easeInOutQuint((s - start) / interval),
-        neptunecameraPosition.phi + (testSun.cameraPosition.phi - neptunecameraPosition.phi) * easeInOutQuint((s - start) / interval),
-        testSun.cameraPosition.theta
+        (neptune.cameraPosition.radius + 0) + sun.cameraPosition.radius - (neptune.cameraPosition.radius + 0) * easeInOutQuint((s - start) / interval),
+        neptune.cameraPosition.phi + (sun.cameraPosition.phi - neptune.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
+        sun.cameraPosition.theta
       );
     }
     camera.position.set(
@@ -889,8 +719,8 @@ function onScrollAnimation() {
   start = (window.pageYOffset + toSunSection.getBoundingClientRect().bottom) - window.innerHeight;
   end = (window.pageYOffset + sunSection.getBoundingClientRect().bottom);
   if (start < s && s <= end) {
-    cameraFocus.set(...testSun.cameraFocus);
-    cameraPosition.setFromSpherical(testSun.cameraPosition);
+    cameraFocus.set(...sun.cameraFocus);
+    cameraPosition.setFromSpherical(sun.cameraPosition);
     camera.position.set(
       cameraFocus.x + cameraPosition.x,
       cameraFocus.y + cameraPosition.y,
@@ -900,17 +730,15 @@ function onScrollAnimation() {
 
 }
 
-window.addEventListener('scroll', onScrollAnimation);
+window.addEventListener('scroll', animateOnScroll);
 
 
 
-// WINDOW RESIZE //
-
-function onWindowResize() {
+function handleWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  mobileMediaChange(mobile);
+  handleMediaChange(mobile);
 }
 
-window.addEventListener("resize", onWindowResize, false);
+window.addEventListener("resize", handleWindowResize, false);

@@ -1,29 +1,25 @@
 import * as THREE from 'three';
 
 export default class Planet {
-  #sphericalPosition;
-  #textureURL;
   #texture;
+  #specularMap;
   #material;
   #geometry;
-  #shininess;
 
-  constructor(radius = 1, sphereSegments = 32, sphericalPosition, textureURL, shininess = 0) {
+  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30 }) {
     this.radius = radius;
-    this.sphereSegments = sphereSegments;
-    this.#sphericalPosition = sphericalPosition;
+    this.sphericalPosition = sphericalPosition;
     this.cameraFocus = new THREE.Vector3();
     this.cameraPosition = new THREE.Spherical();
-    this.#textureURL = textureURL;
-    this.#shininess = shininess;
 
-    this.#texture = new THREE.TextureLoader().load(this.#textureURL);
-    this.#material = new THREE.MeshPhongMaterial({ map: this.#texture, shininess: this.#shininess });
-    this.#geometry = new THREE.SphereBufferGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
+    this.#texture = new THREE.TextureLoader().load(textureURL);
+    this.#specularMap = new THREE.TextureLoader().load(specularMapURL);
+    this.#material = new THREE.MeshPhongMaterial({ map: this.#texture, specularMap: this.#specularMap, shininess });
+    this.#geometry = new THREE.SphereBufferGeometry(radius, sphereSegments, sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
-    this.planet = new THREE.Object3D();
-    this.planet.add(this.mesh);
+    this.object = new THREE.Object3D();
+    this.object.add(this.mesh);
 
-    this.planet.position.setFromSpherical(this.#sphericalPosition);
+    this.object.position.setFromSpherical(this.sphericalPosition);
   }
 }

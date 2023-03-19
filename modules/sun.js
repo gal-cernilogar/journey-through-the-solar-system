@@ -8,11 +8,6 @@ import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
 
 export default class Sun {
-  radius;
-  sphereSegments;
-  cameraFocus;
-  cameraPosition;
-
   #perlinRenderTarget;
   #perlinCamera;
   #perlinMaterial;
@@ -24,11 +19,8 @@ export default class Sun {
   #coronaMaterial;
   #coronaGeometry;
   #coronaMesh;
-  corona;
   #material;
   #geometry;
-  #mesh;
-  sun;
 
   constructor(radius = 1, sphereSegments = 32) {
     this.radius = radius;
@@ -78,8 +70,8 @@ export default class Sun {
       fragmentShader: sunFragment
     });
     this.#geometry = new THREE.SphereBufferGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
-    this.#mesh = new THREE.Mesh(this.#geometry, this.#material);
-    this.sun = new THREE.Object3D().add(this.#mesh, this.#sunLight);
+    this.mesh = new THREE.Mesh(this.#geometry, this.#material);
+    this.object = new THREE.Object3D().add(this.mesh, this.#sunLight);
 
   }
   update(renderer, time) {
