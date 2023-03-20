@@ -7,6 +7,10 @@ import Planet from '/modules/planet.js';
 import PlanetWithClouds from '/modules/planetWithClouds.js';
 import PlanetWithRing from '/modules/planetWithRing.js';
 import Moon from '/modules/moon.js';
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 
 
