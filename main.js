@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 // import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { PI, acos, random, easeInOutQuint } from "/modules/math.js";
+import { PI, easeInOutQuint } from "/modules/math.js";
+import createStars from '/modules/createStars.js';
 import Sun from '/modules/sun.js';
 import Planet from '/modules/planet.js';
 import PlanetWithClouds from '/modules/planetWithClouds.js';
@@ -86,30 +87,11 @@ function permissionHandler() {
 
 permissionBtn.addEventListener('click', permissionHandler);
 
-// Stars
-const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff });
-const starsGeometry = new THREE.BufferGeometry();
-
-function createStars() {
-  const starSpherical = new THREE.Spherical();
-  const starCartesian = new THREE.Vector3();
-  const starPositions = [];
-
-  for (let i = 0; i < 10000; i++) {
-    starSpherical.set(
-      random() * 500 + 500,
-      acos((random() * 2) - 1),
-      random() * 2 * PI
-    );
-    starCartesian.setFromSpherical(starSpherical);
-    starPositions.push(...starCartesian);
-  }
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
-}
-
-createStars();
-
-const stars = new THREE.Points(starsGeometry, starsMaterial);
+const stars = createStars({
+  fromDistance: 500,
+  forDistance: 500,
+  amount: 10000
+});
 
 const sun = new Sun(1, 64);
 
