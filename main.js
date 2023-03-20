@@ -5,6 +5,7 @@ import Sun from '/modules/sun.js';
 import Planet from '/modules/planet.js';
 import PlanetWithClouds from '/modules/planetWithClouds.js';
 import PlanetWithRing from '/modules/planetWithRing.js';
+import Moon from '/modules/moon.js';
 
 
 
@@ -137,14 +138,14 @@ const earth = new PlanetWithClouds({
   cloudsOpacity: 0.5
 });
 
-const moon = new Planet({
+const moon = new Moon({
   radius: 0.0025 * scalingFactor,
   sphereSegments,
-  sphericalPosition: earth.sphericalPosition,
+  sphericalPosition: new THREE.Spherical(0.5637, PI / 2, 0),
+  orbitCenter: earth.sphericalPosition,
   textureURL: '/images/textures/2k_moon-optimized.jpg',
   shininess: null
 });
-moon.mesh.position.setFromSphericalCoords(0.5637, PI / 2, 0);
 moon.mesh.rotation.y = PI / 2;
 
 const mars = new Planet({
@@ -297,8 +298,7 @@ function animate() {
   mercury.mesh.rotateY(timeDelta * 0.1);
   venus.mesh.rotateY(timeDelta * 0.1);
   earth.mesh.rotateY(timeDelta * 0.1);
-  moon.mesh.rotateY(timeDelta * 0.1 / 27);
-  moon.object.rotateY(timeDelta * 0.1 / 27);
+  moon.object.rotateY(timeDelta * 0.1);
   mars.mesh.rotateY(timeDelta * 0.1);
   jupiter.mesh.rotateY(timeDelta * 0.1);
   saturn.mesh.rotateY(timeDelta * 0.1);
