@@ -32,8 +32,6 @@ const toUranusSection = document.querySelector('#toUranusSection');
 const toNeptuneSection = document.querySelector('#toNeptuneSection');
 const toSunSection = document.querySelector('#toSunSection');
 
-const permissionBtn = document.querySelector('#permission-btn');
-
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
 const scalingFactor = 10;
@@ -54,6 +52,10 @@ function mouseMoveHandler(event) {
 
 window.addEventListener('mousemove', mouseMoveHandler);
 
+
+
+const orientationPermissionButton = document.querySelector('#orientation-permission-button');
+
 function deviceOrientationHandler(event) {
   if (window.innerWidth < window.innerHeight) {
     mouse.x = event.gamma / 90;
@@ -62,17 +64,14 @@ function deviceOrientationHandler(event) {
   }
 }
 
-window.addEventListener('deviceorientation', deviceOrientationHandler);
-
-
-function permissionHandler() {
+function orientationPermissionHandler() {
   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
     // Handle iOS 13+ devices.
     DeviceOrientationEvent.requestPermission()
       .then((state) => {
         if (state === 'granted') {
           window.addEventListener('deviceorientation', deviceOrientationHandler);
-          permissionBtn.remove();
+          orientationPermissionButton.remove();
         } else {
           console.error('Request to access the orientation was rejected');
         }
@@ -81,11 +80,11 @@ function permissionHandler() {
   } else {
     // Handle regular non iOS 13+ devices.
     window.addEventListener('deviceorientation', deviceOrientationHandler);
+    orientationPermissionButton.remove();
   }
-  permissionBtn.remove();
 }
 
-permissionBtn.addEventListener('click', permissionHandler);
+orientationPermissionButton.addEventListener('click', orientationPermissionHandler);
 
 const stars = createStars({
   fromDistance: 500,

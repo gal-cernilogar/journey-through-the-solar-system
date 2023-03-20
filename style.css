@@ -162,7 +162,7 @@ li {
 }
 
 .nav-item,
-#permission-btn {
+#orientation-permission-button {
   display: inline-block;
   font-size: 0.875rem;
   font-weight: 700;
@@ -178,14 +178,14 @@ li {
   font-size: 00.875rem;
 }
 
-#permission-btn {
+#orientation-permission-button {
   padding: 0em;
   color: rgb(10, 132, 255);
   background-color: transparent;
   border: none;
 }
 
-#permission-btn:hover {
+#orientation-permission-button:hover {
   color: rgb(100, 210, 255);
   cursor: pointer;
 }
