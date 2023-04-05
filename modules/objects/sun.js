@@ -25,7 +25,7 @@ export default class Sun {
   constructor(radius = 1, sphereSegments = 32) {
     this.radius = radius;
     this.sphereSegments = sphereSegments;
-    this.cameraFocus = new THREE.Vector3();
+    this.cameraFocusPoint = new THREE.Vector3();
     this.cameraPosition = new THREE.Spherical();
 
     // Perlin material is generated off scene for better performance

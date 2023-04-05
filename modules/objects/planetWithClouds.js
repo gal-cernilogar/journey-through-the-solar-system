@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Planet from '/modules/planet.js';
+import Planet from './planet.js';
 
 export default class PlanetWithClouds extends Planet {
   #cloudsTexture;
