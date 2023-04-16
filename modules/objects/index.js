@@ -7,6 +7,19 @@ import PlanetWithRing from './planetWithRing.js';
 import Moon from './moon.js';
 import { PI } from "/modules/math.js";
 
+import mercuryTextureURL from '/images/textures/2k_mercury-optimized.jpg';
+import venusTextureURL from '/images/textures/2k_venus_surface-optimized.jpg';
+import earthTextureURL from '/images/textures/2k_earth_daymap-optimized.jpg';
+import earthSpecularMapURL from '/images/textures/2k_earth_specular_map-optimized.jpg';
+import earthCloudsTextureURL from '/images/textures/2k_earth_clouds-optimized.jpg';
+import moonTextureURL from '/images/textures/2k_moon-optimized.jpg';
+import marsTextureURL from '/images/textures/2k_mars-optimized.jpg';
+import jupiterTextureURL from '/images/textures/2k_jupiter-optimized.jpg';
+import saturnTextureURL from '/images/textures/2k_saturn-optimized.jpg';
+import saturnRingTextureURL from '/images/textures/2k_saturn_ring_alpha.png';
+import uranusTextureURL from '/images/textures/2k_uranus-optimized.jpg';
+import neptuneTextureURL from '/images/textures/2k_neptune-optimized.jpg';
+
 const scalingFactor = 10;
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -25,14 +38,14 @@ const mercury = new Planet({
   radius: 0.0035 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(49 / scalingFactor, PI / 2, - PI / 300),
-  textureURL: '/images/textures/2k_mercury-optimized.jpg'
+  textureURL: mercuryTextureURL
 });
 
 const venus = new Planet({
   radius: 0.0087 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(80 / scalingFactor, PI / 2, PI / 4),
-  textureURL: '/images/textures/2k_venus_surface-optimized.jpg',
+  textureURL: venusTextureURL,
   shininess: null
 });
 
@@ -40,9 +53,9 @@ const earth = new PlanetWithClouds({
   radius: 0.0091 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(110 / scalingFactor, PI / 2, 0),
-  textureURL: '/images/textures/2k_earth_daymap-optimized.jpg',
-  specularMapURL: '/images/textures/2k_earth_specular_map-optimized.jpg',
-  cloudsTextureURL: '/images/textures/2k_earth_clouds-optimized.jpg',
+  textureURL: earthTextureURL,
+  specularMapURL: earthSpecularMapURL,
+  cloudsTextureURL: earthCloudsTextureURL,
   cloudsOpacity: 0.5
 });
 
@@ -51,7 +64,7 @@ const moon = new Moon({
   sphereSegments,
   sphericalPosition: new THREE.Spherical(0.5637, PI / 2, 0),
   orbitCenter: earth.sphericalPosition,
-  textureURL: '/images/textures/2k_moon-optimized.jpg',
+  textureURL: moonTextureURL,
   shininess: null
 });
 moon.mesh.rotation.y = PI / 2;
@@ -60,14 +73,14 @@ const mars = new Planet({
   radius: 0.0049 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(150 / scalingFactor, PI / 2, PI / 2),
-  textureURL: '/images/textures/2k_mars-optimized.jpg'
+  textureURL: marsTextureURL
 });
 
 const jupiter = new Planet({
   radius: 0.1004 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(535 / scalingFactor, PI / 2, - PI / 2),
-  textureURL: '/images/textures/2k_jupiter-optimized.jpg',
+  textureURL: jupiterTextureURL,
   shininess: null
 });
 
@@ -75,9 +88,9 @@ const saturn = new PlanetWithRing({
   radius: 0.0836 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(1060 / scalingFactor, PI / 2, - PI / 4),
-  textureURL: '/images/textures/2k_saturn-optimized.jpg',
+  textureURL: saturnTextureURL,
   shininess: null,
-  ringTextureURL: '/images/textures/2k_saturn_ring_alpha.png'
+  ringTextureURL: saturnRingTextureURL
 });
 saturn.mesh.rotation.z = PI * 0.1485;
 saturn.mesh.rotation.y = - PI * 0.1485;
@@ -87,7 +100,7 @@ const uranus = new Planet({
   radius: 0.0364 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(2115 / scalingFactor, PI / 2, PI),
-  textureURL: '/images/textures/2k_uranus-optimized.jpg',
+  textureURL: uranusTextureURL,
   shininess: null
 });
 uranus.mesh.rotation.z = - PI / 2;
@@ -97,7 +110,7 @@ const neptune = new Planet({
   radius: 0.0354 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(3215 / scalingFactor, PI / 2, - 3 * PI / 4),
-  textureURL: '/images/textures/2k_neptune-optimized.jpg',
+  textureURL: neptuneTextureURL,
   shininess: null
 });
 
