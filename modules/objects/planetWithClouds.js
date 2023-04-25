@@ -17,7 +17,7 @@ export default class PlanetWithClouds extends Planet {
       blending: THREE.AdditiveBlending,
       shininess: null
     });
-    this.#cloudsGeometry = new THREE.SphereBufferGeometry(radius * 1.01, sphereSegments, sphereSegments / 2);
+    this.#cloudsGeometry = new THREE.SphereGeometry(radius * 1.01, sphereSegments, sphereSegments / 2);
     this.cloudsMesh = new THREE.Mesh(this.#cloudsGeometry, this.#cloudsMaterial);
     this.mesh.add(this.cloudsMesh);
   }

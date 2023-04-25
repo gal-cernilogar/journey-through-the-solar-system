@@ -16,7 +16,7 @@ export default class PlanetWithClouds extends Planet {
       side: THREE.DoubleSide,
       transparent: true
     });
-    this.#ringGeometry = new THREE.RingBufferGeometry(radius * 1.3062, radius * 2.2859, sphereSegments);
+    this.#ringGeometry = new THREE.RingGeometry(radius * 1.3062, radius * 2.2859, sphereSegments);
 
     const pos = this.#ringGeometry.attributes.position;
     const v3 = new THREE.Vector3();

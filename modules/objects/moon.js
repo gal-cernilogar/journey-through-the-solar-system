@@ -16,7 +16,7 @@ export default class Moon {
     this.#texture = new THREE.TextureLoader().load(textureURL);
     this.#specularMap = new THREE.TextureLoader().load(specularMapURL);
     this.#material = new THREE.MeshPhongMaterial({ map: this.#texture, specularMap: this.#specularMap, shininess });
-    this.#geometry = new THREE.SphereBufferGeometry(radius, sphereSegments, sphereSegments / 2);
+    this.#geometry = new THREE.SphereGeometry(radius, sphereSegments, sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
     this.mesh.position.setFromSpherical(this.sphericalPosition);
     this.object = new THREE.Object3D();

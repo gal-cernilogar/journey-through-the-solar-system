@@ -44,7 +44,7 @@ export default class Sun {
       vertexShader: perlinVertex,
       fragmentShader: perlinFragment
     });
-    this.#perlinGeometry = new THREE.SphereBufferGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
+    this.#perlinGeometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
     this.#perlinMesh = new THREE.Mesh(this.#perlinGeometry, this.#perlinMaterial);
     this.#offScene = new THREE.Scene().add(this.#perlinMesh);
 
@@ -56,7 +56,7 @@ export default class Sun {
       vertexShader: coronaVertex,
       fragmentShader: coronaFragment
     });
-    this.#coronaGeometry = new THREE.SphereBufferGeometry(this.radius * 1.2, this.sphereSegments, this.sphereSegments / 2);
+    this.#coronaGeometry = new THREE.SphereGeometry(this.radius * 1.2, this.sphereSegments, this.sphereSegments / 2);
     this.#coronaMesh = new THREE.Mesh(this.#coronaGeometry, this.#coronaMaterial);
     this.corona = new THREE.Object3D().add(this.#coronaMesh);
 
@@ -69,7 +69,7 @@ export default class Sun {
       vertexShader: sunVertex,
       fragmentShader: sunFragment
     });
-    this.#geometry = new THREE.SphereBufferGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
+    this.#geometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
     this.object = new THREE.Object3D().add(this.mesh, this.#sunLight);
 

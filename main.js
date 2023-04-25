@@ -88,7 +88,6 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
-renderer.physicallyCorrectLights = false;
 renderer.setAnimationLoop(update);
 document.body.appendChild(renderer.domElement);
 
