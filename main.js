@@ -33,18 +33,18 @@ const mouse = {
   y: 0
 };
 
-function mouseMoveHandler(event) {
+function handleMouseMove(event) {
   mouse.x = (event.clientX / innerWidth) * 2 - 1;
   // mouse.y = -(event.clientY / innerHeight) * 2 + 1;
 }
 
-window.addEventListener('mousemove', mouseMoveHandler);
+window.addEventListener('mousemove', handleMouseMove);
 
 
 
 const orientationPermissionButton = document.querySelector('#orientation-permission-button');
 
-function deviceOrientationHandler(event) {
+function handleDeviceOrientation(event) {
   if (window.innerWidth < window.innerHeight) {
     mouse.x = event.gamma / 90;
   } else {
@@ -52,13 +52,13 @@ function deviceOrientationHandler(event) {
   }
 }
 
-function orientationPermissionHandler() {
+function handleOrientationPermission() {
   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
     // Handle iOS 13+ devices.
     DeviceOrientationEvent.requestPermission()
       .then((state) => {
         if (state === 'granted') {
-          window.addEventListener('deviceorientation', deviceOrientationHandler);
+          window.addEventListener('deviceorientation', handleDeviceOrientation);
           orientationPermissionButton.remove();
         } else {
           console.error('Request to access the orientation was rejected');
@@ -67,12 +67,12 @@ function orientationPermissionHandler() {
       .catch(console.error);
   } else {
     // Handle regular non iOS 13+ devices.
-    window.addEventListener('deviceorientation', deviceOrientationHandler);
+    window.addEventListener('deviceorientation', handleDeviceOrientation);
     orientationPermissionButton.remove();
   }
 }
 
-orientationPermissionButton.addEventListener('click', orientationPermissionHandler);
+orientationPermissionButton.addEventListener('click', handleOrientationPermission);
 
 
 
@@ -164,7 +164,6 @@ handleMediaChange(mobile);
 
 
 function update() {
-
   const timeDelta = clock.getDelta();
 
   stars.rotateY(- timeDelta * 0.02);
@@ -194,7 +193,6 @@ function update() {
   camera.lookAt(...camera.focusPoint);
 
   renderer.render(scene, camera);
-
 }
 
 update();
@@ -202,7 +200,6 @@ update();
 
 
 function handleScroll() {
-
   const s = window.pageYOffset;
 
   // Init
@@ -513,7 +510,6 @@ function handleScroll() {
     camera.focusPoint.y + camera.localPosition.y,
     camera.focusPoint.z + camera.localPosition.z
   );
-
 }
 
 window.addEventListener('scroll', handleScroll);
