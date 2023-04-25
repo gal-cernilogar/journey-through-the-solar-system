@@ -1,11 +1,6 @@
 import * as THREE from 'three';
-// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune } from '/modules/objects';
 import { PI, easeInOutQuint } from "/modules/math.js";
-// import { Expo, gsap } from "gsap";
-// import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-// gsap.registerPlugin(ScrollTrigger);
 
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -94,15 +89,10 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.physicallyCorrectLights = false;
-renderer.setAnimationLoop(animate);
+renderer.setAnimationLoop(update);
 document.body.appendChild(renderer.domElement);
 
-/* const gridHelper = new THREE.GridHelper(10, 50);
-scene.add(gridHelper); */
 
-// const controls = new OrbitControls(camera, renderer.domElement);
-/* controls.autoRotate = false;
-controls.autoRotateSpeed = -0.5; */
 
 function handleMediaChange(mediaQuery) {
   if (mediaQuery.matches) {
@@ -127,7 +117,7 @@ function handleMediaChange(mediaQuery) {
     neptune.cameraPosition.set(neptune.radius * 6, PI / 2.1, PI * 0.5);
     sun.cameraPosition.set(sun.radius * 6, PI / 2, 5 * PI / 4);
 
-    animateOnScroll();
+    handleScroll();
   } else {
     mercury.cameraFocusPoint.set(...new THREE.Vector3(...mercury.object.position).add(
       new THREE.Vector3().setFromSphericalCoords(mercury.radius, PI / 2, mercury.sphericalPosition.theta + PI / 2)
@@ -166,7 +156,7 @@ function handleMediaChange(mediaQuery) {
     neptune.cameraPosition.set(neptune.radius * 3, PI / 2.1, PI * 0.5);
     sun.cameraPosition.set(sun.radius * 3, PI / 2, 5 * PI / 4);
 
-    animateOnScroll();
+    handleScroll();
   }
 }
 
@@ -174,7 +164,7 @@ handleMediaChange(mobile);
 
 
 
-function animate() {
+function update() {
 
   const timeDelta = clock.getDelta();
 
@@ -202,41 +192,17 @@ function animate() {
   uranus.object.rotation.y = mouse.x / 2;
   neptune.object.rotation.y = mouse.x / 2;
 
-  // controls.target.set(...camera.focusPoint);
-  // controls.update();
   camera.lookAt(...camera.focusPoint);
 
   renderer.render(scene, camera);
 
 }
 
-animate();
+update();
 
 
 
-// const toMercuryAnimation = gsap.timeline().to(camera.focusPoint, {
-//   x: mercury.cameraFocusPoint.x,
-//   y: mercury.cameraFocusPoint.y,
-//   z: mercury.cameraFocusPoint.z,
-//   ease: Expo.easeInOut
-// }, 0).to(camera.localPosition, {
-//   x: mercury.cameraPosition.x,
-//   y: mercury.cameraPosition.y,
-//   z: mercury.cameraPosition.z,
-//   ease: Expo.easeInOut
-// }, 0);
-
-// ScrollTrigger.defaults({
-//   markers: true,
-//   scrub: 1
-// });
-
-// ScrollTrigger.create({
-//   animation: toMercuryAnimation,
-//   trigger: toMercurySection
-// });
-
-function animateOnScroll() {
+function handleScroll() {
 
   const s = window.pageYOffset;
 
@@ -288,7 +254,7 @@ function animateOnScroll() {
         mercury.cameraPosition.theta + (venus.cameraPosition.theta - mercury.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (mercury.cameraPosition.radius + 10) + venus.cameraPosition.radius - (mercury.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
         mercury.cameraPosition.phi + (venus.cameraPosition.phi - mercury.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -322,7 +288,7 @@ function animateOnScroll() {
         venus.cameraPosition.theta + (earth.cameraPosition.theta - venus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (venus.cameraPosition.radius + 10) + earth.cameraPosition.radius - (venus.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
         venus.cameraPosition.phi + (earth.cameraPosition.phi - venus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -356,7 +322,7 @@ function animateOnScroll() {
         earth.cameraPosition.theta + (mars.cameraPosition.theta - earth.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (earth.cameraPosition.radius + 10) + mars.cameraPosition.radius - (earth.cameraPosition.radius + 10) * easeInOutQuint((s - start) / interval),
         earth.cameraPosition.phi + (mars.cameraPosition.phi - earth.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -390,7 +356,7 @@ function animateOnScroll() {
         mars.cameraPosition.theta + (jupiter.cameraPosition.theta - mars.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (mars.cameraPosition.radius + 100) + jupiter.cameraPosition.radius - (mars.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
         mars.cameraPosition.phi + (jupiter.cameraPosition.phi - mars.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -424,7 +390,7 @@ function animateOnScroll() {
         jupiter.cameraPosition.theta + (saturn.cameraPosition.theta - jupiter.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (jupiter.cameraPosition.radius + 100) + saturn.cameraPosition.radius - (jupiter.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
         jupiter.cameraPosition.phi + (saturn.cameraPosition.phi - jupiter.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -458,7 +424,7 @@ function animateOnScroll() {
         saturn.cameraPosition.theta + (uranus.cameraPosition.theta - saturn.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (saturn.cameraPosition.radius + 100) + uranus.cameraPosition.radius - (saturn.cameraPosition.radius + 100) * easeInOutQuint((s - start) / interval),
         saturn.cameraPosition.phi + (uranus.cameraPosition.phi - saturn.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -492,7 +458,7 @@ function animateOnScroll() {
         uranus.cameraPosition.theta + (neptune.cameraPosition.theta - uranus.cameraPosition.theta) * easeInOutQuint((s - start) / interval)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (uranus.cameraPosition.radius + 200) + neptune.cameraPosition.radius - (uranus.cameraPosition.radius + 200) * easeInOutQuint((s - start) / interval),
         uranus.cameraPosition.phi + (neptune.cameraPosition.phi - uranus.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -526,7 +492,7 @@ function animateOnScroll() {
         neptune.cameraPosition.theta + (sun.cameraPosition.theta - neptune.cameraPosition.theta) * easeInOutQuint((s - start) / interval * 2)
       );
     }
-    if (start + interval / 2 < s && s <= end) {
+    else if (start + interval / 2 < s && s <= end) {
       camera.localPosition.setFromSphericalCoords(
         (neptune.cameraPosition.radius + 0) + sun.cameraPosition.radius - (neptune.cameraPosition.radius + 0) * easeInOutQuint((s - start) / interval),
         neptune.cameraPosition.phi + (sun.cameraPosition.phi - neptune.cameraPosition.phi) * easeInOutQuint((s - start) / interval),
@@ -551,7 +517,7 @@ function animateOnScroll() {
 
 }
 
-window.addEventListener('scroll', animateOnScroll);
+window.addEventListener('scroll', handleScroll);
 
 
 
