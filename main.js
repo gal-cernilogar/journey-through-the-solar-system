@@ -78,6 +78,7 @@ orientationPermissionButton.addEventListener('click', handleOrientationPermissio
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.001, 2000);
 camera.focusPoint = new THREE.Vector3();
+camera.currentFocusPoint = new THREE.Vector3(0, 0, 0);
 camera.localPosition = new THREE.Vector3();
 const welcomecameraPosition = new THREE.Spherical();
 
@@ -190,7 +191,8 @@ function update() {
   uranus.object.rotation.y = mouse.x / 2;
   neptune.object.rotation.y = mouse.x / 2;
 
-  camera.lookAt(...camera.focusPoint);
+  camera.position.lerp(new THREE.Vector3(...camera.focusPoint).add(camera.localPosition), 2 * timeDelta);
+  camera.lookAt(camera.currentFocusPoint.lerp(camera.focusPoint, 2 * timeDelta));
 
   renderer.render(scene, camera);
 }
@@ -504,12 +506,6 @@ function handleScroll() {
     camera.focusPoint.set(...sun.cameraFocusPoint);
     camera.localPosition.setFromSpherical(sun.cameraPosition);
   }
-
-  camera.position.set(
-    camera.focusPoint.x + camera.localPosition.x,
-    camera.focusPoint.y + camera.localPosition.y,
-    camera.focusPoint.z + camera.localPosition.z
-  );
 }
 
 window.addEventListener('scroll', handleScroll);
