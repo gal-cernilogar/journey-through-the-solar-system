@@ -78,10 +78,9 @@ img,
   border-radius: 1em;
 }
 
-canvas {
+#app {
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;
   z-index: -1;
 }
 
@@ -230,10 +229,6 @@ li {
 
 .source a:hover {
   color: white;
-}
-
-section#quiz {
-  padding-block-end: 5em;
 }
 
 @media (min-width: 1024px) {
