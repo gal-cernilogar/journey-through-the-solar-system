@@ -415,7 +415,7 @@ export default function createApp(domContainer, sections) {
     else if (sections.toUranus.offset < currentOffset && currentOffset <= sections.uranus.offset) tweens.uranus();
     else if (sections.uranus.offset < currentOffset && currentOffset <= sections.toNeptune.offset) tweens.toNeptune(currentOffset);
     else if (sections.toNeptune.offset < currentOffset && currentOffset <= sections.neptune.offset) tweens.neptune();
-    else if (sections.neptune.offsetart < currentOffset && currentOffset <= sections.toSun.offset) tweens.toSun(currentOffset);
+    else if (sections.neptune.offset < currentOffset && currentOffset <= sections.toSun.offset) tweens.toSun(currentOffset);
     else if (sections.toSun.offset < currentOffset && currentOffset <= sections.sun.offset) tweens.sun();
   }
 
