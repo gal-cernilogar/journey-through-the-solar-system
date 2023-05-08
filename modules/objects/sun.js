@@ -7,7 +7,7 @@ import coronaFragment from '/shaders/coronaShader/fragment.glsl';
 import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
 
-export default class Sun {
+export default class Sun extends THREE.Object3D {
   #perlinRenderTarget;
   #perlinCamera;
   #perlinMaterial;
@@ -23,6 +23,7 @@ export default class Sun {
   #geometry;
 
   constructor(radius = 1, sphereSegments = 32) {
+    super();
     this.radius = radius;
     this.sphereSegments = sphereSegments;
     this.cameraFocusPoint = new THREE.Vector3();
@@ -58,7 +59,6 @@ export default class Sun {
     });
     this.#coronaGeometry = new THREE.SphereGeometry(this.radius * 1.2, this.sphereSegments, this.sphereSegments / 2);
     this.#coronaMesh = new THREE.Mesh(this.#coronaGeometry, this.#coronaMaterial);
-    this.corona = new THREE.Object3D().add(this.#coronaMesh);
 
     this.#material = new THREE.ShaderMaterial({
       side: THREE.DoubleSide,
@@ -71,10 +71,11 @@ export default class Sun {
     });
     this.#geometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
-    this.object = new THREE.Object3D().add(this.mesh, this.#sunLight);
-
+    this.add(this.mesh, this.#coronaMesh, this.#sunLight);
   }
-  update(renderer, time) {
+
+  update(camera, renderer, time) {
+    this.#coronaMesh.lookAt(camera.position);
     this.#perlinCamera.update(renderer, this.#offScene);
     this.#perlinMaterial.uniforms.time.value = time;
     this.#material.uniforms.time.value = time;

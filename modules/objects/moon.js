@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 
-export default class Moon {
+export default class Moon extends THREE.Object3D {
   #texture;
   #specularMap;
   #material;
   #geometry;
 
   constructor({ radius = 1, sphereSegments = 32, orbitCenter, sphericalPosition, textureURL, specularMapURL, shininess = 30 }) {
+    super();
     this.radius = radius;
     this.orbitCenter = orbitCenter;
     this.sphericalPosition = sphericalPosition;
@@ -19,9 +20,12 @@ export default class Moon {
     this.#geometry = new THREE.SphereGeometry(radius, sphereSegments, sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
     this.mesh.position.setFromSpherical(this.sphericalPosition);
-    this.object = new THREE.Object3D();
-    this.object.add(this.mesh);
+    this.add(this.mesh);
 
-    this.object.position.setFromSpherical(this.orbitCenter);
+    this.position.setFromSpherical(this.orbitCenter);
+  }
+
+  update(timeDelta) {
+    this.rotateY(timeDelta * 0.1 / 27);
   }
 }

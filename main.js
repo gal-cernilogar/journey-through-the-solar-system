@@ -4,7 +4,13 @@ const mobileMediaQuery = window.matchMedia("(max-width: 1023px)");
 
 const appContainer = document.getElementById('app');
 
-const orientationPermissionButton = document.getElementById('orientation-permission-button');
+const orientationPermissionLi = document.getElementById('orientation-permission-li');
+const orientationPermissionButton = document.createElement('button');
+if (!localStorage.getItem('orientationPermission')) {
+  orientationPermissionButton.setAttribute('id', 'orientation-permission-button');
+  orientationPermissionButton.textContent = 'ENABLE MOTION';
+  orientationPermissionLi.appendChild(orientationPermissionButton);
+}
 
 const welcomeSection = document.getElementById('welcome');
 const mercurySection = document.getElementById('mercury');
@@ -48,10 +54,15 @@ const sections = {
   toSun: { domElement: toSunSection, offset: toSunSection.offsetTop + toSunSection.offsetHeight - window.innerHeight }
 };
 
+const mouse = {
+  x: 0,
+  y: 0
+};
+
 let app;
 
 if (appContainer && orientationPermissionButton && sections) {
-  app = createApp(appContainer, sections);
+  app = createApp(appContainer, sections, mouse);
 
   window.addEventListener('mousemove', app.handleMouseMove);
   window.addEventListener('scroll', app.handleScroll);
@@ -64,13 +75,15 @@ if (appContainer && orientationPermissionButton && sections) {
   appResizeObserver.observe(appContainer);
 
 }
+
 function handleOrientationPermission() {
   if (!app || !orientationPermissionButton) return;
+
   if (typeof DeviceOrientationEvent.requestPermission === 'function') {
     // Handle iOS 13+ devices.
     DeviceOrientationEvent.requestPermission().then((state) => {
       if (state === 'granted') {
-        window.addEventListener('deviceorientation', app.handleDeviceOrientation);
+        window.addEventListener('deviceorientation', handleDeviceOrientation);
         orientationPermissionButton.remove();
       } else {
         console.error('Request to access the orientation was rejected');
@@ -78,7 +91,16 @@ function handleOrientationPermission() {
     }).catch(console.error);
   } else {
     // Handle regular non iOS 13+ devices.
-    window.addEventListener('deviceorientation', app.handleDeviceOrientation);
+    window.addEventListener('deviceorientation', handleDeviceOrientation);
+    localStorage.setItem('orientationPermission', 'true');
     orientationPermissionButton.remove();
+  }
+}
+
+function handleDeviceOrientation(event) {
+  if (window.innerWidth < window.innerHeight) {
+    mouse.x = event.gamma / 90;
+  } else {
+    mouse.x = event.beta * 2 / 180;
   }
 }

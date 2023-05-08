@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import createStars from './createStars.js';
+import Stars from './stars.js';
 import Sun from './sun.js';
 import Planet from './planet.js';
 import PlanetWithClouds from './planetWithClouds.js';
@@ -26,7 +26,7 @@ const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 let sphereSegments;
 mobile.matches ? sphereSegments = 32 : sphereSegments = 64;
 
-const stars = createStars({
+const stars = new Stars({
   fromDistance: 500,
   forDistance: 500,
   amount: 100000

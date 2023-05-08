@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 
-export default class Planet {
+export default class Planet extends THREE.Object3D {
   #texture;
   #specularMap;
   #material;
   #geometry;
 
   constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30 }) {
+    super();
     this.radius = radius;
     this.sphericalPosition = sphericalPosition;
     this.cameraFocusPoint = new THREE.Vector3();
@@ -17,9 +18,13 @@ export default class Planet {
     this.#material = new THREE.MeshPhongMaterial({ map: this.#texture, specularMap: this.#specularMap, shininess });
     this.#geometry = new THREE.SphereGeometry(radius, sphereSegments, sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
-    this.object = new THREE.Object3D();
-    this.object.add(this.mesh);
+    this.add(this.mesh);
 
-    this.object.position.setFromSpherical(this.sphericalPosition);
+    this.position.setFromSpherical(this.sphericalPosition);
+  }
+
+  update(timeDelta, mouse) {
+    this.mesh.rotateY(timeDelta * 0.1);
+    this.rotation.y = mouse.x / 2;
   }
 }
