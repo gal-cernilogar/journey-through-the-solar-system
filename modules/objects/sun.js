@@ -26,8 +26,6 @@ export default class Sun extends THREE.Object3D {
     super();
     this.radius = radius;
     this.sphereSegments = sphereSegments;
-    this.cameraFocusPoint = new THREE.Vector3();
-    this.cameraPosition = new THREE.Spherical();
 
     // Perlin material is generated off scene for better performance
     this.#perlinRenderTarget = new THREE.WebGLCubeRenderTarget(256, {

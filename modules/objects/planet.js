@@ -10,8 +10,6 @@ export default class Planet extends THREE.Object3D {
     super();
     this.radius = radius;
     this.sphericalPosition = sphericalPosition;
-    this.cameraFocusPoint = new THREE.Vector3();
-    this.cameraPosition = new THREE.Spherical();
 
     this.#texture = new THREE.TextureLoader().load(textureURL);
     this.#specularMap = new THREE.TextureLoader().load(specularMapURL);

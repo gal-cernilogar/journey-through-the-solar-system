@@ -11,8 +11,6 @@ export default class Moon extends THREE.Object3D {
     this.radius = radius;
     this.orbitCenter = orbitCenter;
     this.sphericalPosition = sphericalPosition;
-    this.cameraFocusPoint = new THREE.Vector3();
-    this.cameraPosition = new THREE.Spherical();
 
     this.#texture = new THREE.TextureLoader().load(textureURL);
     this.#specularMap = new THREE.TextureLoader().load(specularMapURL);
