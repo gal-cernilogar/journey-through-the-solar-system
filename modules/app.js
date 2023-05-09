@@ -13,28 +13,28 @@ export default function createApp(domContainer, sections, mouse) {
   const clock = new THREE.Clock();
 
   function update() {
-    const timeDelta = clock.getDelta();
+    const dt = clock.getDelta();
 
-    stars.update(timeDelta);
+    stars.update(dt);
     sun.update(camera, renderer, clock.elapsedTime);
-    mercury.update(timeDelta, mouse);
-    venus.update(timeDelta, mouse);
-    earth.update(timeDelta, mouse);
-    moon.update(timeDelta);
-    mars.update(timeDelta, mouse);
-    jupiter.update(timeDelta, mouse);
-    saturn.update(timeDelta, mouse);
-    uranus.update(timeDelta, mouse);
-    neptune.update(timeDelta, mouse);
+    mercury.update(dt, mouse);
+    venus.update(dt, mouse);
+    earth.update(dt, mouse);
+    moon.update(dt);
+    mars.update(dt, mouse);
+    jupiter.update(dt, mouse);
+    saturn.update(dt, mouse);
+    uranus.update(dt, mouse);
+    neptune.update(dt, mouse);
 
-    camera.update(timeDelta);
+    camera.update(dt);
 
     renderer.render(scene, camera);
   }
 
   function handleMouseMove(event) {
     mouse.x = (event.clientX / domContainer.clientWidth) * 2 - 1;
-    mouse.y = - (event.clientY / domContainer.clientHeight) * 2 + 1;
+    // mouse.y = - (event.clientY / domContainer.clientHeight) * 2 + 1;
   }
 
   function handleMediaChange(mediaQuery) {
@@ -57,7 +57,7 @@ export default function createApp(domContainer, sections, mouse) {
       camera.neptuneFocusPoint.copy(neptune.position);
       camera.sunFocusPoint.copy(sun.position);
 
-      camera.initialOrbitPosition.set(sun.radius * 6, PI / 2.05, PI / 100);
+      camera.heroOrbitPosition.set(sun.radius * 6, PI / 2.05, PI / 100);
       camera.mercuryOrbitPosition.set(mercury.radius * 6, PI / 2.1, PI * 0.8);
       camera.venusOrbitPosition.set(venus.radius * 6, PI / 2.1, PI * 1.4);
       camera.earthOrbitPosition.set(earth.radius * 6, PI / 2.1, PI * 0.8);
@@ -96,7 +96,7 @@ export default function createApp(domContainer, sections, mouse) {
       ));
       camera.sunFocusPoint.copy(sun.position);
 
-      camera.initialOrbitPosition.set(sun.radius * 5, PI / 2.005, PI / 1000);
+      camera.heroOrbitPosition.set(sun.radius * 5, PI / 2.005, PI / 1000);
       camera.mercuryOrbitPosition.set(mercury.radius * 3, PI / 2.1, PI * 0.8);
       camera.venusOrbitPosition.set(venus.radius * 3, PI / 2.1, PI * 1.4);
       camera.earthOrbitPosition.set(earth.radius * 3, PI / 2.1, PI * 0.8);

@@ -23,7 +23,7 @@ export default class Stars extends THREE.Points {
     super(starsGeometry, starsMaterial);
   }
 
-  update(timeDelta) {
-    this.rotateY(- timeDelta * 0.02);
+  update(dt) {
+    this.rotateY(- dt * 0.02);
   }
 }

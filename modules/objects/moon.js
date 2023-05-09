@@ -23,7 +23,7 @@ export default class Moon extends THREE.Object3D {
     this.position.setFromSpherical(this.orbitCenter);
   }
 
-  update(timeDelta) {
-    this.rotateY(timeDelta * 0.1 / 27);
+  update(dt) {
+    this.rotateY(dt * 0.1 / 27);
   }
 }

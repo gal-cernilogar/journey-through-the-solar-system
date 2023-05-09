@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { easeInOutQuint } from "./math.js";
+import { easeInOutQuint, lerpFactor } from "./math.js";
 
 export default class Camera extends THREE.PerspectiveCamera {
   constructor(domContainer) {
@@ -18,7 +18,7 @@ export default class Camera extends THREE.PerspectiveCamera {
     this.sunFocusPoint = new THREE.Vector3();
 
     this.idealOrbitPosition = new THREE.Vector3();
-    this.initialOrbitPosition = new THREE.Spherical();
+    this.heroOrbitPosition = new THREE.Spherical();
     this.mercuryOrbitPosition = new THREE.Spherical();
     this.venusOrbitPosition = new THREE.Spherical();
     this.earthOrbitPosition = new THREE.Spherical();
@@ -32,15 +32,15 @@ export default class Camera extends THREE.PerspectiveCamera {
     this.idealPosition = new THREE.Vector3();
   }
 
-  update(timeDelta) {
-    const lerpFactor = 1 - Math.pow(0.1, timeDelta);
+  update(dt) {
+    const lf = lerpFactor(0.1, dt);
 
-    this.position.lerp(this.idealPosition, lerpFactor);
-    this.lookAt(this.currentFocusPoint.lerp(this.idealFocusPoint, lerpFactor));
+    this.position.lerp(this.idealPosition, lf);
+    this.lookAt(this.currentFocusPoint.lerp(this.idealFocusPoint, lf));
   }
 
   updateOnScroll(sections, currentOffset) {
-    if (currentOffset === 0) this.#onInitial();
+    if (currentOffset === 0) this.#onHero();
     else if (currentOffset <= sections.toMercury.offset) this.#toMercury(sections, currentOffset);
     else if (currentOffset <= sections.mercury.offset) this.#onMercury();
     else if (currentOffset <= sections.toVenus.offset) this.#toVenus(sections, currentOffset);
@@ -63,9 +63,9 @@ export default class Camera extends THREE.PerspectiveCamera {
     this.idealPosition.copy(this.idealFocusPoint).add(this.idealOrbitPosition);
   }
 
-  #onInitial() {
+  #onHero() {
     this.idealFocusPoint.copy(this.sunFocusPoint);
-    this.idealOrbitPosition.setFromSpherical(this.initialOrbitPosition);
+    this.idealOrbitPosition.setFromSpherical(this.heroOrbitPosition);
   }
 
   #toMercury(sections, currentOffset) {
@@ -78,9 +78,9 @@ export default class Camera extends THREE.PerspectiveCamera {
       this.mercuryFocusPoint.z * easeInOutQuint((currentOffset - start) / interval)
     );
     this.idealOrbitPosition.setFromSphericalCoords(
-      this.initialOrbitPosition.radius + (this.mercuryOrbitPosition.radius - this.initialOrbitPosition.radius) * easeInOutQuint((currentOffset - start) / interval),
-      this.initialOrbitPosition.phi + (this.mercuryOrbitPosition.phi - this.initialOrbitPosition.phi) * easeInOutQuint((currentOffset - start) / interval),
-      this.initialOrbitPosition.theta + (this.mercuryOrbitPosition.theta - this.initialOrbitPosition.theta) * easeInOutQuint((currentOffset - start) / interval)
+      this.heroOrbitPosition.radius + (this.mercuryOrbitPosition.radius - this.heroOrbitPosition.radius) * easeInOutQuint((currentOffset - start) / interval),
+      this.heroOrbitPosition.phi + (this.mercuryOrbitPosition.phi - this.heroOrbitPosition.phi) * easeInOutQuint((currentOffset - start) / interval),
+      this.heroOrbitPosition.theta + (this.mercuryOrbitPosition.theta - this.heroOrbitPosition.theta) * easeInOutQuint((currentOffset - start) / interval)
     );
   }
 

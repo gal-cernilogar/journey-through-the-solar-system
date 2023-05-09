@@ -21,8 +21,8 @@ export default class Planet extends THREE.Object3D {
     this.position.setFromSpherical(this.sphericalPosition);
   }
 
-  update(timeDelta, mouse) {
-    this.mesh.rotateY(timeDelta * 0.1);
+  update(dt, mouse) {
+    this.mesh.rotateY(dt * 0.1);
     this.rotation.y = mouse.x / 2;
   }
 }

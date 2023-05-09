@@ -36,3 +36,7 @@ export function easeInOutCirc(x) {
     ? (1 - Math.sqrt(1 - Math.pow(2 * x, 2))) / 2
     : (Math.sqrt(1 - Math.pow(-2 * x + 2, 2)) + 1) / 2;
 }
+
+export function lerpFactor(x, dt) {
+  return 1 - Math.pow(x, dt);
+}

@@ -5,14 +5,8 @@ const mobileMediaQuery = window.matchMedia("(max-width: 1023px)");
 const appContainer = document.getElementById('app');
 
 const orientationPermissionLi = document.getElementById('orientation-permission-li');
-const orientationPermissionButton = document.createElement('button');
-if (!localStorage.getItem('orientationPermission')) {
-  orientationPermissionButton.setAttribute('id', 'orientation-permission-button');
-  orientationPermissionButton.textContent = 'ENABLE MOTION';
-  orientationPermissionLi.appendChild(orientationPermissionButton);
-}
 
-const welcomeSection = document.getElementById('welcome');
+const heroSection = document.getElementById('hero');
 const mercurySection = document.getElementById('mercury');
 const venusSection = document.getElementById('venus');
 const earthSection = document.getElementById('earth');
@@ -33,7 +27,7 @@ const toNeptuneSection = document.getElementById('toNeptune');
 const toSunSection = document.getElementById('toSun');
 
 const sections = {
-  welcome: { domElement: welcomeSection, offset: welcomeSection.offsetTop + welcomeSection.offsetHeight },
+  hero: { domElement: heroSection, offset: heroSection.offsetTop + heroSection.offsetHeight },
   mercury: { domElement: mercurySection, offset: mercurySection.offsetTop + mercurySection.offsetHeight },
   venus: { domElement: venusSection, offset: venusSection.offsetTop + venusSection.offsetHeight },
   earth: { domElement: earthSection, offset: earthSection.offsetTop + earthSection.offsetHeight },
@@ -59,14 +53,23 @@ const mouse = {
   y: 0
 };
 
-let app;
+let app, orientationPermissionButton;
 
-if (appContainer && orientationPermissionButton && sections) {
+if (!localStorage.getItem('orientationPermission')) {
+  orientationPermissionButton = document.createElement('button');
+  orientationPermissionButton.setAttribute('id', 'orientation-permission-button');
+  orientationPermissionButton.textContent = 'ENABLE MOTION';
+  orientationPermissionLi.appendChild(orientationPermissionButton);
+} else {
+  window.addEventListener('deviceorientation', handleDeviceOrientation);
+}
+
+if (appContainer && sections) {
   app = createApp(appContainer, sections, mouse);
 
   window.addEventListener('mousemove', app.handleMouseMove);
   window.addEventListener('scroll', app.handleScroll);
-  orientationPermissionButton.addEventListener('click', handleOrientationPermission);
+  if (orientationPermissionButton) orientationPermissionButton.addEventListener('click', handleOrientationPermission);
 
   const appResizeObserver = new ResizeObserver(entries => {
     entries.forEach(entry => app.handleAppResize(entry.target, mobileMediaQuery));
