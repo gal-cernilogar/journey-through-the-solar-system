@@ -6,18 +6,15 @@ export default class PlanetWithClouds extends Planet {
   #cloudsMaterial;
   #cloudsGeometry;
 
-  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30, cloudsTextureURL, cloudsOpacity = 1 }) {
+  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30, cloudsTextureURL }) {
     super({ radius, sphereSegments, sphericalPosition, textureURL, specularMapURL, shininess });
 
     this.#cloudsTexture = new THREE.TextureLoader().load(cloudsTextureURL);
-    this.#cloudsMaterial = new THREE.MeshPhongMaterial({
-      map: this.#cloudsTexture,
-      opacity: cloudsOpacity,
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      shininess: null
+    this.#cloudsMaterial = new THREE.MeshLambertMaterial({
+      alphaMap: this.#cloudsTexture,
+      transparent: true
     });
-    this.#cloudsGeometry = new THREE.SphereGeometry(radius * 1.01, sphereSegments, sphereSegments / 2);
+    this.#cloudsGeometry = new THREE.SphereGeometry(radius * 1.005, sphereSegments, sphereSegments / 2);
     this.cloudsMesh = new THREE.Mesh(this.#cloudsGeometry, this.#cloudsMaterial);
     this.mesh.add(this.cloudsMesh);
   }

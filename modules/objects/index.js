@@ -55,8 +55,7 @@ const earth = new PlanetWithClouds({
   sphericalPosition: new THREE.Spherical(110 / scalingFactor, PI / 2, 0),
   textureURL: earthTextureURL,
   specularMapURL: earthSpecularMapURL,
-  cloudsTextureURL: earthCloudsTextureURL,
-  cloudsOpacity: 0.5
+  cloudsTextureURL: earthCloudsTextureURL
 });
 
 const moon = new Moon({
