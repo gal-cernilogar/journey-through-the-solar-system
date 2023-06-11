@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module';
 import Camera from './camera';
 import Scene from './scene';
 import Renderer from './renderer';
@@ -11,6 +12,9 @@ export default function createApp(domContainer, sections, mouse) {
   const renderer = new Renderer(domContainer, update);
 
   const clock = new THREE.Clock();
+
+  const stats = new Stats();
+  document.body.appendChild(stats.dom);
 
   function update() {
     const dt = clock.getDelta();
@@ -28,6 +32,8 @@ export default function createApp(domContainer, sections, mouse) {
     neptune.update(dt, mouse);
 
     camera.update(dt);
+
+    stats.update();
 
     renderer.render(scene, camera);
   }
