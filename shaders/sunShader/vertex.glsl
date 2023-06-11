@@ -10,7 +10,7 @@ varying vec3 vNormal;
 mat2 rotate(float a) {
   float s = sin(a);
   float c = cos(a);
-  return mat2(c, -s ,s, c);
+  return mat2(c, -s, s, c);
 }
 
 void main() {
@@ -18,7 +18,7 @@ void main() {
 
   vec4 worldPosition = modelMatrix * vec4(position, 1.0);
   eyeVector = normalize(worldPosition.xyz - cameraPosition);
-  
+
   float t = time * 0.002;
 
   mat2 rot = rotate(t);
