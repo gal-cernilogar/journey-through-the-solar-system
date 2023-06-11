@@ -32,7 +32,7 @@ const stars = new Stars({
   amount: 100000
 });
 
-const sun = new Sun(1, 64);
+const sun = new Sun(1, sphereSegments);
 
 const mercury = new Planet({
   radius: 0.0035 * scalingFactor,

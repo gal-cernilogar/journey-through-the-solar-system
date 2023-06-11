@@ -123,26 +123,24 @@ float snoise(vec4 v) {
 
 }
 
-// 6
-
 float fbm(vec4 p) {
   float sum = 0.;
   float amp = 1.;
   float scale = 1.;
-  for (int i = 0; i < 8; i++) {
-    sum += snoise(p * scale) * amp;
+  for (int i = 0; i < 5; i++) {
     p.w += 100.;
     amp *= 0.9;
     scale *= 2.;
+    sum += snoise(p * scale) * amp;
   }
   return (sum);
 }
 
 void main() {
   vec4 p = vec4(vPosition * 4., time * 0.02);
-  float noisy = fbm(p);
+  float noise = fbm(p);
   vec4 p1 = vec4(vPosition * 2., time * 0.05);
   float spots = max(snoise(p1), 0.);
-  gl_FragColor = vec4(noisy);
+  gl_FragColor = vec4(noise);
   gl_FragColor *= mix(1., spots, 0.6);
 }

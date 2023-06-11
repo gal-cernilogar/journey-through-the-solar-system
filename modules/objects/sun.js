@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import perlinFragment from '/shaders/perlinShader/fragment.glsl';
-import perlinVertex from '/shaders/perlinShader/vertex.glsl';
+import noiseFragment from '/shaders/noiseShader/fragment.glsl';
+import noiseVertex from '/shaders/noiseShader/vertex.glsl';
 import sunVertex from '/shaders/sunShader/vertex.glsl';
 import sunFragment from '/shaders/sunShader/fragment.glsl';
 import coronaFragment from '/shaders/coronaShader/fragment.glsl';
@@ -8,14 +8,14 @@ import coronaVertex from '/shaders/coronaShader/vertex.glsl';
 
 
 export default class Sun extends THREE.Object3D {
-  #perlinRenderTarget;
-  #perlinCamera;
-  #perlinMaterial;
-  #perlinGeometry;
-  #perlinMesh;
+  #noiseRenderTarget;
+  #noiseCamera;
+  #noiseMaterial;
+  #noiseGeometry;
+  #noiseMesh;
   #offScene;
 
-  #sunLight;
+  #light;
   #coronaMaterial;
   #coronaGeometry;
   #coronaMesh;
@@ -27,28 +27,28 @@ export default class Sun extends THREE.Object3D {
     this.radius = radius;
     this.sphereSegments = sphereSegments;
 
-    // Perlin material is generated off scene for better performance
-    this.#perlinRenderTarget = new THREE.WebGLCubeRenderTarget(256, {
+    // Noise material is generated off scene for better performance
+    this.#noiseRenderTarget = new THREE.WebGLCubeRenderTarget(sphereSegments * 8, {
       format: THREE.RGBAFormat,
       generateMipmaps: true,
       minFilter: THREE.LinearMipmapLinearFilter,
-      encoding: THREE.sRGBEncoding
+      encoding: THREE.SRGBColorSpace
     });
-    this.#perlinCamera = new THREE.CubeCamera(this.radius - this.radius / 2, this.radius + this.radius / 2, this.#perlinRenderTarget);
-    this.#perlinMaterial = new THREE.ShaderMaterial({
+    this.#noiseCamera = new THREE.CubeCamera(this.radius - this.radius / 2, this.radius + this.radius / 2, this.#noiseRenderTarget);
+    this.#noiseMaterial = new THREE.ShaderMaterial({
       side: THREE.DoubleSide,
       uniforms: {
         time: { value: 0 },
       },
-      vertexShader: perlinVertex,
-      fragmentShader: perlinFragment
+      vertexShader: noiseVertex,
+      fragmentShader: noiseFragment
     });
-    this.#perlinGeometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
-    this.#perlinMesh = new THREE.Mesh(this.#perlinGeometry, this.#perlinMaterial);
-    this.#offScene = new THREE.Scene().add(this.#perlinMesh);
+    this.#noiseGeometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
+    this.#noiseMesh = new THREE.Mesh(this.#noiseGeometry, this.#noiseMaterial);
+    this.#offScene = new THREE.Scene().add(this.#noiseMesh);
 
     // The Sun
-    this.#sunLight = new THREE.PointLight(0xffffff, 1);
+    this.#light = new THREE.PointLight(0xffffff, 1);
     this.#coronaMaterial = new THREE.ShaderMaterial({
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
@@ -62,21 +62,21 @@ export default class Sun extends THREE.Object3D {
       side: THREE.DoubleSide,
       uniforms: {
         time: { value: 0 },
-        uPerlin: { value: null },
+        uNoise: { value: null },
       },
       vertexShader: sunVertex,
       fragmentShader: sunFragment
     });
     this.#geometry = new THREE.SphereGeometry(this.radius, this.sphereSegments, this.sphereSegments / 2);
     this.mesh = new THREE.Mesh(this.#geometry, this.#material);
-    this.add(this.mesh, this.#coronaMesh, this.#sunLight);
+    this.add(this.mesh, this.#coronaMesh, this.#light);
   }
 
   update(camera, renderer, time) {
     this.#coronaMesh.lookAt(camera.position);
-    this.#perlinCamera.update(renderer, this.#offScene);
-    this.#perlinMaterial.uniforms.time.value = time;
+    this.#noiseCamera.update(renderer, this.#offScene);
+    this.#noiseMaterial.uniforms.time.value = time;
     this.#material.uniforms.time.value = time;
-    this.#material.uniforms.uPerlin.value = this.#perlinRenderTarget.texture;
+    this.#material.uniforms.uNoise.value = this.#noiseRenderTarget.texture;
   }
 }

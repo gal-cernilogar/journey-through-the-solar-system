@@ -1,4 +1,4 @@
-uniform samplerCube uPerlin;
+uniform samplerCube uNoise;
 varying vec3 vNormal;
 varying vec3 eyeVector;
 varying vec3 vLayer0;
@@ -17,9 +17,9 @@ vec3 brightnessToColor(float b) {
 
 float supersun() {
   float sum = 0.;
-  sum += textureCube(uPerlin, vLayer0).r;
-  sum += textureCube(uPerlin, vLayer1).r;
-  sum += textureCube(uPerlin, vLayer2).r;
+  sum += textureCube(uNoise, vLayer0).r;
+  sum += textureCube(uNoise, vLayer1).r;
+  sum += textureCube(uNoise, vLayer2).r;
   sum *= 0.3;
   return sum;
 }
