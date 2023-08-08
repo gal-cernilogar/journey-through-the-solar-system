@@ -5,7 +5,7 @@ export default class Renderer extends THREE.WebGLRenderer {
     super({ antialias: false });
     this.setPixelRatio(window.devicePixelRatio);
     this.setSize(domContainer.clientWidth, domContainer.clientHeight);
-    this.outputEncoding = THREE.sRGBEncoding;
+    this.outputColorSpace = THREE.SRGBColorSpace;
     this.setAnimationLoop(updateCallback);
     domContainer.appendChild(this.domElement);
   }
