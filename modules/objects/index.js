@@ -29,7 +29,7 @@ mobile.matches ? sphereSegments = 32 : sphereSegments = 64;
 const stars = new Stars({
   fromDistance: 500,
   forDistance: 500,
-  amount: 100000
+  amount: 10000
 });
 
 const sun = new Sun(1, sphereSegments);

@@ -19,7 +19,7 @@ export default function createApp(domContainer, sections, mouse) {
   function update() {
     const dt = clock.getDelta();
 
-    stars.update(dt);
+    stars.update(dt, camera.position);
     sun.update(camera, renderer, clock.elapsedTime);
     mercury.update(dt, mouse);
     venus.update(dt, mouse);
