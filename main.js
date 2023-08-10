@@ -76,7 +76,6 @@ if (appContainer && sections) {
   });
 
   appResizeObserver.observe(appContainer);
-
 }
 
 function handleOrientationPermission() {
