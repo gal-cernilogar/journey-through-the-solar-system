@@ -7,11 +7,11 @@ vec3 brightnessToColor(float b) {
 }
 
 void main() {
-  float radial = 1. - vPosition.z;
-  radial *= radial * radial;
+  float radialGradient = 1. - vPosition.z;
+  radialGradient *= radialGradient * radialGradient;
 
-  float brightness = 1. + radial * 0.83;
+  float brightness = 1. + radialGradient * 0.83;
 
-  gl_FragColor.rgb = brightnessToColor(brightness) * radial;
-  gl_FragColor.a = radial;
+  gl_FragColor.rgb = brightnessToColor(brightness) * radialGradient;
+  gl_FragColor.a = radialGradient;
 }
