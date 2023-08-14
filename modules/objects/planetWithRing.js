@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import Planet from './planet.js';
 
-export default class PlanetWithClouds extends Planet {
+export default class PlanetWithRing extends Planet {
   #ringTexture;
   #ringMaterial;
   #ringGeometry;
