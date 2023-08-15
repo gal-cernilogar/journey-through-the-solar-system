@@ -74,8 +74,8 @@ export default class Sun extends THREE.Object3D {
 
   update(camera, renderer, time) {
     this.#coronaMesh.lookAt(camera.position);
-    this.#noiseCamera.update(renderer, this.#offScene);
     this.#noiseMaterial.uniforms.time.value = time;
+    this.#noiseCamera.update(renderer, this.#offScene);
     this.#material.uniforms.time.value = time;
     this.#material.uniforms.uNoise.value = this.#noiseRenderTarget.texture;
   }
