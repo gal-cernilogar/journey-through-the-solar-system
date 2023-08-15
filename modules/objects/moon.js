@@ -6,7 +6,7 @@ export default class Moon extends THREE.Object3D {
   #material;
   #geometry;
 
-  constructor({ radius = 1, sphereSegments = 32, orbitCenter, sphericalPosition, textureURL, specularMapURL, shininess = 30 }) {
+  constructor({ radius = 1, sphereSegments = 32, orbitCenter, sphericalPosition, textureURL, specularMapURL, shininess = null }) {
     super();
     this.radius = radius;
     this.orbitCenter = orbitCenter;

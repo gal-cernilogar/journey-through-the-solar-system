@@ -45,8 +45,7 @@ const venus = new Planet({
   radius: 0.0087 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(80 / scalingFactor, PI / 2, PI / 4),
-  textureURL: venusTextureURL,
-  shininess: null
+  textureURL: venusTextureURL
 });
 
 const earth = new PlanetWithClouds({
@@ -55,7 +54,8 @@ const earth = new PlanetWithClouds({
   sphericalPosition: new THREE.Spherical(110 / scalingFactor, PI / 2, 0),
   textureURL: earthTextureURL,
   specularMapURL: earthSpecularMapURL,
-  cloudsTextureURL: earthCloudsTextureURL
+  cloudsTextureURL: earthCloudsTextureURL,
+  shininess: 30
 });
 
 const moon = new Moon({
@@ -63,8 +63,7 @@ const moon = new Moon({
   sphereSegments,
   sphericalPosition: new THREE.Spherical(0.5637, PI / 2, 0),
   orbitCenter: earth.sphericalPosition,
-  textureURL: moonTextureURL,
-  shininess: null
+  textureURL: moonTextureURL
 });
 moon.mesh.rotation.y = PI / 2;
 
@@ -79,8 +78,7 @@ const jupiter = new Planet({
   radius: 0.1004 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(535 / scalingFactor, PI / 2, - PI / 2),
-  textureURL: jupiterTextureURL,
-  shininess: null
+  textureURL: jupiterTextureURL
 });
 
 const saturn = new PlanetWithRing({
@@ -88,7 +86,6 @@ const saturn = new PlanetWithRing({
   sphereSegments,
   sphericalPosition: new THREE.Spherical(1060 / scalingFactor, PI / 2, - PI / 4),
   textureURL: saturnTextureURL,
-  shininess: null,
   ringTextureURL: saturnRingTextureURL
 });
 saturn.mesh.rotation.z = PI * 0.1485;
@@ -99,8 +96,7 @@ const uranus = new Planet({
   radius: 0.0364 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(2115 / scalingFactor, PI / 2, PI),
-  textureURL: uranusTextureURL,
-  shininess: null
+  textureURL: uranusTextureURL
 });
 uranus.mesh.rotation.z = - PI / 2;
 uranus.mesh.rotation.y = - PI / 4;
@@ -109,8 +105,7 @@ const neptune = new Planet({
   radius: 0.0354 * scalingFactor,
   sphereSegments,
   sphericalPosition: new THREE.Spherical(3215 / scalingFactor, PI / 2, - 3 * PI / 4),
-  textureURL: neptuneTextureURL,
-  shininess: null
+  textureURL: neptuneTextureURL
 });
 
 export { stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune };

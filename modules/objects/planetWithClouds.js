@@ -6,7 +6,7 @@ export default class PlanetWithClouds extends Planet {
   #cloudsMaterial;
   #cloudsGeometry;
 
-  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30, cloudsTextureURL }) {
+  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = null, cloudsTextureURL }) {
     super({ radius, sphereSegments, sphericalPosition, textureURL, specularMapURL, shininess });
 
     this.#cloudsTexture = new THREE.TextureLoader().load(cloudsTextureURL);

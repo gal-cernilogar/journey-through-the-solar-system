@@ -6,7 +6,7 @@ export default class PlanetWithRing extends Planet {
   #ringMaterial;
   #ringGeometry;
 
-  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30, ringTextureURL }) {
+  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = null, ringTextureURL }) {
     super({ radius, sphereSegments, sphericalPosition, textureURL, specularMapURL, shininess });
 
     this.#ringTexture = new THREE.TextureLoader().load(ringTextureURL);

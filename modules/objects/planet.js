@@ -6,7 +6,7 @@ export default class Planet extends THREE.Object3D {
   #material;
   #geometry;
 
-  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = 30 }) {
+  constructor({ radius = 1, sphereSegments = 32, sphericalPosition, textureURL, specularMapURL, shininess = null }) {
     super();
     this.radius = radius;
     this.sphericalPosition = sphericalPosition;
