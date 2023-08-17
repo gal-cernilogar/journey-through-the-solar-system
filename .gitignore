@@ -13,6 +13,7 @@ images/textures/unused
 images/textures/tifs
 DaVinci
 *.local
+blender
 
 # Editor directories and files
 .vscode/*
