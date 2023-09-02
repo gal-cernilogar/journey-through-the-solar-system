@@ -10,7 +10,7 @@ export default class PlanetGLTF extends THREE.Object3D {
 
     loadGLTF(modelURL, gltf => {
       const planet = gltf.scene;
-      console.log(planet.children);
+      console.log(planet.children[0].name, planet.children);
 
       planet.children[0].scale.setScalar(this.radius);
 
