@@ -33,9 +33,9 @@ export default function createApp(domContainer, sections, mouse) {
 
     camera.update(dt);
 
-    stats.update();
-
     renderer.render(scene, camera);
+
+    stats.update();
   }
 
   function handleMouseMove(event) {
