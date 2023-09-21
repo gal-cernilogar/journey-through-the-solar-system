@@ -5,6 +5,16 @@ import PlanetGLTF from './planetGLTF.js';
 import MoonGLTF from './moonGLTF.js';
 import { PI } from "/modules/math.js";
 
+import mercuryModelURL from '/models/mercury.glb';
+import venusModelURL from '/models/venus.glb';
+import earthModelURL from '/models/earth.glb';
+import moonModelURL from '/models/moon.glb';
+import marsModelURL from '/models/mars.glb';
+import jupiterModelURL from '/models/jupiter.glb';
+import saturnModelURL from '/models/saturn.glb';
+import uranusModelURL from '/models/uranus.glb';
+import neptuneModelURL from '/models/neptune.glb';
+
 const scalingFactor = 10;
 const mobile = window.matchMedia("(max-width: 1023px)"); // Mobile media query
 
@@ -20,56 +30,56 @@ const stars = new Stars({
 const sun = new Sun(1, sphereSegments);
 
 const mercury = new PlanetGLTF({
-  modelURL: '/models/mercury.glb',
+  modelURL: mercuryModelURL,
   radius: 0.0035 * scalingFactor,
   sphericalPosition: new THREE.Spherical(49 / scalingFactor, PI / 2, - PI / 300)
 });
 
 const venus = new PlanetGLTF({
-  modelURL: '/models/venus.glb',
+  modelURL: venusModelURL,
   radius: 0.0087 * scalingFactor,
   sphericalPosition: new THREE.Spherical(80 / scalingFactor, PI / 2, PI / 4)
 });
 
 const earth = new PlanetGLTF({
-  modelURL: '/models/earth.glb',
+  modelURL: earthModelURL,
   radius: 0.0091 * scalingFactor,
   sphericalPosition: new THREE.Spherical(110 / scalingFactor, PI / 2, 0)
 });
 
 const moon = new MoonGLTF({
-  modelURL: '/models/moon.glb',
+  modelURL: moonModelURL,
   radius: 0.0025 * scalingFactor,
   sphericalPosition: new THREE.Spherical(0.5637, PI / 2, 0),
   orbitCenter: earth.sphericalPosition
 });
 
 const mars = new PlanetGLTF({
-  modelURL: '/models/mars.glb',
+  modelURL: marsModelURL,
   radius: 0.0049 * scalingFactor,
   sphericalPosition: new THREE.Spherical(150 / scalingFactor, PI / 2, PI / 2)
 });
 
 const jupiter = new PlanetGLTF({
-  modelURL: '/models/jupiter.glb',
+  modelURL: jupiterModelURL,
   radius: 0.1004 * scalingFactor,
   sphericalPosition: new THREE.Spherical(535 / scalingFactor, PI / 2, - PI / 2),
 });
 
 const saturn = new PlanetGLTF({
-  modelURL: '/models/saturn.glb',
+  modelURL: saturnModelURL,
   radius: 0.0836 * scalingFactor,
   sphericalPosition: new THREE.Spherical(1060 / scalingFactor, PI / 2, - PI / 4),
 });
 
 const uranus = new PlanetGLTF({
-  modelURL: '/models/uranus.glb',
+  modelURL: uranusModelURL,
   radius: 0.0364 * scalingFactor,
   sphericalPosition: new THREE.Spherical(2115 / scalingFactor, PI / 2, PI),
 });
 
 const neptune = new PlanetGLTF({
-  modelURL: '/models/neptune.glb',
+  modelURL: neptuneModelURL,
   radius: 0.0354 * scalingFactor,
   sphericalPosition: new THREE.Spherical(3215 / scalingFactor, PI / 2, - 3 * PI / 4),
 });

@@ -1,6 +1,8 @@
+import { defineConfig } from 'vite';
 import vitePluginString from 'vite-plugin-string';
 
-export default {
+export default defineConfig({
   base: '/journey-through-the-solar-system/',
-  plugins: [vitePluginString()]
-};
+  plugins: [vitePluginString()],
+  assetsInclude: ['**/*.glb']
+});
