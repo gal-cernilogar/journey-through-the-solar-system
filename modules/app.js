@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import Stats from 'three/examples/jsm/libs/stats.module';
 import Camera from './camera';
 import Scene from './scene';
 import Renderer from './renderer';
@@ -13,11 +12,29 @@ export default function createApp(domContainer, sections, mouse) {
 
   const clock = new THREE.Clock();
 
-  const stats = new Stats();
-  document.body.appendChild(stats.dom);
+  let times = [];
+  let isTesting = false;
+
+  THREE.DefaultLoadingManager.onLoad = function () {
+    isTesting = true;
+
+    setTimeout(() => {
+      isTesting = false;
+      times = times.map(time => time * 1000).sort((a, b) => a - b);
+
+      const sum = times.reduce((a, b) => a + b, 0);
+      const average = sum / times.length;
+
+      console.table(times);
+      console.log(`Average: ${average}`);
+      console.log(`Min: ${times[0]}`);
+      console.log(`Max: ${times[times.length - 1]}`);
+    }, 1000);
+  };
 
   function update() {
     const dt = clock.getDelta();
+    if (isTesting) times.push(dt);
 
     stars.update(dt, camera.position);
     sun.update(camera, renderer, clock.elapsedTime);
@@ -32,8 +49,6 @@ export default function createApp(domContainer, sections, mouse) {
     neptune.update(dt, mouse);
 
     camera.update(dt);
-
-    stats.update();
 
     renderer.render(scene, camera);
   }
