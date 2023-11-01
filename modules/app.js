@@ -4,149 +4,146 @@ import Scene from './scene';
 import Renderer from './renderer';
 import { stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune } from '/modules/objects';
 import { PI } from "/modules/math.js";
+import Tester from './tester';
 
-export default function createApp(domContainer, sections, mouse) {
-  const camera = new Camera(domContainer);
-  const scene = new Scene({ stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune });
-  const renderer = new Renderer(domContainer, update);
+export default class App {
+  #domContainer;
+  #sections;
+  #mouse;
+  #mediaQuery;
 
-  const clock = new THREE.Clock();
+  #camera;
+  #scene;
+  #renderer;
+  #clock;
+  #tester;
 
-  let times = [];
-  let isTesting = false;
+  constructor(domContainer, sections, mouse, mediaQuery) {
+    this.#domContainer = domContainer;
+    this.#sections = sections;
+    this.#mouse = mouse;
+    this.#mediaQuery = mediaQuery;
 
-  THREE.DefaultLoadingManager.onLoad = function () {
-    isTesting = true;
+    this.#tester = new Tester(10000);
+    this.#clock = new THREE.Clock();
+    this.#camera = new Camera(this.#domContainer);
+    this.#scene = new Scene({ stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune });
+    this.#renderer = new Renderer(this.#domContainer, this.update);
+  }
 
-    setTimeout(() => {
-      isTesting = false;
-      times = times.map(time => time * 1000).sort((a, b) => a - b);
+  update = () => {
+    const startTime = performance.now();
+    const dt = this.#clock.getDelta();
 
-      const sum = times.reduce((a, b) => a + b, 0);
-      const average = sum / times.length;
+    stars.update(dt, this.#camera.position);
+    sun.update(this.#camera, this.#renderer, this.#clock.elapsedTime);
+    mercury.update(dt, this.#mouse);
+    venus.update(dt, this.#mouse);
+    earth.update(dt, this.#mouse);
+    moon.update(dt);
+    mars.update(dt, this.#mouse);
+    jupiter.update(dt, this.#mouse);
+    saturn.update(dt, this.#mouse);
+    uranus.update(dt, this.#mouse);
+    neptune.update(dt, this.#mouse);
 
-      console.table(times);
-      console.log(`Average: ${average}`);
-      console.log(`Min: ${times[0]}`);
-      console.log(`Max: ${times[times.length - 1]}`);
-    }, 1000);
+    this.#camera.update(dt);
+
+    this.#renderer.render(this.#scene, this.#camera);
+    if (this.#tester.isTesting) this.#tester.times.push(performance.now() - startTime);
   };
 
-  function update() {
-    const dt = clock.getDelta();
-    if (isTesting) times.push(dt);
+  handleMouseMove = (event) => {
+    this.#mouse.x = (event.clientX / this.#domContainer.clientWidth) * 2 - 1;
+  };
 
-    stars.update(dt, camera.position);
-    sun.update(camera, renderer, clock.elapsedTime);
-    mercury.update(dt, mouse);
-    venus.update(dt, mouse);
-    earth.update(dt, mouse);
-    moon.update(dt);
-    mars.update(dt, mouse);
-    jupiter.update(dt, mouse);
-    saturn.update(dt, mouse);
-    uranus.update(dt, mouse);
-    neptune.update(dt, mouse);
+  handleScroll = () => {
+    const currentOffset = window.scrollY;
 
-    camera.update(dt);
+    this.#camera.updateOnScroll(this.#sections, currentOffset);
+  };
 
-    renderer.render(scene, camera);
-  }
-
-  function handleMouseMove(event) {
-    mouse.x = (event.clientX / domContainer.clientWidth) * 2 - 1;
-    // mouse.y = - (event.clientY / domContainer.clientHeight) * 2 + 1;
-  }
-
-  function handleMediaChange(mediaQuery) {
-    Object.keys(sections).forEach(sectionKey => {
+  handleMediaChange = () => {
+    Object.keys(this.#sections).forEach(sectionKey => {
       if (sectionKey.startsWith('to')) {
-        sections[sectionKey].offset = sections[sectionKey].domElement.offsetTop + sections[sectionKey].domElement.offsetHeight - window.innerHeight;
+        this.#sections[sectionKey].offset = this.#sections[sectionKey].domElement.offsetTop + this.#sections[sectionKey].domElement.offsetHeight - window.innerHeight;
       } else {
-        sections[sectionKey].offset = sections[sectionKey].domElement.offsetTop + sections[sectionKey].domElement.offsetHeight;
+        this.#sections[sectionKey].offset = this.#sections[sectionKey].domElement.offsetTop + this.#sections[sectionKey].domElement.offsetHeight;
       }
     });
 
-    if (mediaQuery.matches) {
-      camera.mercuryFocusPoint.copy(mercury.position);
-      camera.venusFocusPoint.copy(venus.position);
-      camera.earthFocusPoint.copy(earth.position);
-      camera.marsFocusPoint.copy(mars.position);
-      camera.jupiterFocusPoint.copy(jupiter.position);
-      camera.saturnFocusPoint.copy(saturn.position);
-      camera.uranusFocusPoint.copy(uranus.position);
-      camera.neptuneFocusPoint.copy(neptune.position);
-      camera.sunFocusPoint.copy(sun.position);
+    if (this.#mediaQuery.matches) {
+      this.#camera.mercuryFocusPoint.copy(mercury.position);
+      this.#camera.venusFocusPoint.copy(venus.position);
+      this.#camera.earthFocusPoint.copy(earth.position);
+      this.#camera.marsFocusPoint.copy(mars.position);
+      this.#camera.jupiterFocusPoint.copy(jupiter.position);
+      this.#camera.saturnFocusPoint.copy(saturn.position);
+      this.#camera.uranusFocusPoint.copy(uranus.position);
+      this.#camera.neptuneFocusPoint.copy(neptune.position);
+      this.#camera.sunFocusPoint.copy(sun.position);
 
-      camera.heroOrbitPosition.set(sun.radius * 6, PI / 2.05, PI / 100);
-      camera.mercuryOrbitPosition.set(mercury.radius * 6, PI / 2.1, PI * 0.8);
-      camera.venusOrbitPosition.set(venus.radius * 6, PI / 2.1, PI * 1.4);
-      camera.earthOrbitPosition.set(earth.radius * 6, PI / 2.1, PI * 0.8);
-      camera.marsOrbitPosition.set(mars.radius * 6, PI / 2.1, PI * 1.7);
-      camera.jupiterOrbitPosition.set(jupiter.radius * 6, PI / 2.1, PI * 0.3);
-      camera.saturnOrbitPosition.set(saturn.radius * 6, PI / 2.1, PI * 1);
-      camera.uranusOrbitPosition.set(uranus.radius * 6, PI / 2.1, PI * (-0.2));
-      camera.neptuneOrbitPosition.set(neptune.radius * 6, PI / 2.1, PI * 0.5);
-      camera.sunOrbitPosition.set(sun.radius * 6, PI / 2, 5 * PI / 4);
+      this.#camera.heroOrbitPosition.set(sun.radius * 6, PI / 2.05, PI / 100);
+      this.#camera.mercuryOrbitPosition.set(mercury.radius * 6, PI / 2.1, PI * 0.8);
+      this.#camera.venusOrbitPosition.set(venus.radius * 6, PI / 2.1, PI * 1.4);
+      this.#camera.earthOrbitPosition.set(earth.radius * 6, PI / 2.1, PI * 0.8);
+      this.#camera.marsOrbitPosition.set(mars.radius * 6, PI / 2.1, PI * 1.7);
+      this.#camera.jupiterOrbitPosition.set(jupiter.radius * 6, PI / 2.1, PI * 0.3);
+      this.#camera.saturnOrbitPosition.set(saturn.radius * 6, PI / 2.1, PI * 1);
+      this.#camera.uranusOrbitPosition.set(uranus.radius * 6, PI / 2.1, PI * (-0.2));
+      this.#camera.neptuneOrbitPosition.set(neptune.radius * 6, PI / 2.1, PI * 0.5);
+      this.#camera.sunOrbitPosition.set(sun.radius * 6, PI / 2, 5 * PI / 4);
 
-      handleScroll();
+      this.handleScroll();
     } else {
-      camera.mercuryFocusPoint.copy(new THREE.Vector3(...mercury.position).add(
+      this.#camera.mercuryFocusPoint.copy(new THREE.Vector3(...mercury.position).add(
         new THREE.Vector3().setFromSphericalCoords(mercury.radius, PI / 2, mercury.sphericalPosition.theta + PI / 2)
       ));
-      camera.venusFocusPoint.copy(new THREE.Vector3(...venus.position).add(
+      this.#camera.venusFocusPoint.copy(new THREE.Vector3(...venus.position).add(
         new THREE.Vector3().setFromSphericalCoords(venus.radius, PI / 2, venus.sphericalPosition.theta - PI / 2)
       ));
-      camera.earthFocusPoint.copy(new THREE.Vector3(...earth.position).add(
+      this.#camera.earthFocusPoint.copy(new THREE.Vector3(...earth.position).add(
         new THREE.Vector3().setFromSphericalCoords(earth.radius, PI / 2, earth.sphericalPosition.theta + PI / 2)
       ));
-      camera.marsFocusPoint.copy(new THREE.Vector3(...mars.position).add(
+      this.#camera.marsFocusPoint.copy(new THREE.Vector3(...mars.position).add(
         new THREE.Vector3().setFromSphericalCoords(mars.radius, PI / 2, mars.sphericalPosition.theta - PI / 2)
       ));
-      camera.jupiterFocusPoint.copy(new THREE.Vector3(...jupiter.position).add(
+      this.#camera.jupiterFocusPoint.copy(new THREE.Vector3(...jupiter.position).add(
         new THREE.Vector3().setFromSphericalCoords(jupiter.radius, PI / 2, jupiter.sphericalPosition.theta + PI / 2)
       ));
-      camera.saturnFocusPoint.copy(new THREE.Vector3(...saturn.position).add(
+      this.#camera.saturnFocusPoint.copy(new THREE.Vector3(...saturn.position).add(
         new THREE.Vector3().setFromSphericalCoords(saturn.radius, PI / 2, saturn.sphericalPosition.theta - PI / 2)
       ));
-      camera.uranusFocusPoint.copy(new THREE.Vector3(...uranus.position).add(
+      this.#camera.uranusFocusPoint.copy(new THREE.Vector3(...uranus.position).add(
         new THREE.Vector3().setFromSphericalCoords(uranus.radius, PI / 2, uranus.sphericalPosition.theta + PI / 2)
       ));
-      camera.neptuneFocusPoint.copy(new THREE.Vector3(...neptune.position).add(
+      this.#camera.neptuneFocusPoint.copy(new THREE.Vector3(...neptune.position).add(
         new THREE.Vector3().setFromSphericalCoords(neptune.radius, PI / 2, neptune.sphericalPosition.theta - PI / 2)
       ));
-      camera.sunFocusPoint.copy(sun.position);
+      this.#camera.sunFocusPoint.copy(sun.position);
 
-      camera.heroOrbitPosition.set(sun.radius * 5, PI / 2.005, PI / 1000);
-      camera.mercuryOrbitPosition.set(mercury.radius * 3, PI / 2.1, PI * 0.8);
-      camera.venusOrbitPosition.set(venus.radius * 3, PI / 2.1, PI * 1.4);
-      camera.earthOrbitPosition.set(earth.radius * 3, PI / 2.1, PI * 0.8);
-      camera.marsOrbitPosition.set(mars.radius * 3, PI / 2.1, PI * 1.7);
-      camera.jupiterOrbitPosition.set(jupiter.radius * 3, PI / 2.1, PI * 0.3);
-      camera.saturnOrbitPosition.set(saturn.radius * 3, PI / 2.1, PI * 1);
-      camera.uranusOrbitPosition.set(uranus.radius * 3, PI / 2.1, PI * (-0.2));
-      camera.neptuneOrbitPosition.set(neptune.radius * 3, PI / 2.1, PI * 0.5);
-      camera.sunOrbitPosition.set(sun.radius * 3, PI / 2, 5 * PI / 4);
+      this.#camera.heroOrbitPosition.set(sun.radius * 5, PI / 2.005, PI / 1000);
+      this.#camera.mercuryOrbitPosition.set(mercury.radius * 3, PI / 2.1, PI * 0.8);
+      this.#camera.venusOrbitPosition.set(venus.radius * 3, PI / 2.1, PI * 1.4);
+      this.#camera.earthOrbitPosition.set(earth.radius * 3, PI / 2.1, PI * 0.8);
+      this.#camera.marsOrbitPosition.set(mars.radius * 3, PI / 2.1, PI * 1.7);
+      this.#camera.jupiterOrbitPosition.set(jupiter.radius * 3, PI / 2.1, PI * 0.3);
+      this.#camera.saturnOrbitPosition.set(saturn.radius * 3, PI / 2.1, PI * 1);
+      this.#camera.uranusOrbitPosition.set(uranus.radius * 3, PI / 2.1, PI * (-0.2));
+      this.#camera.neptuneOrbitPosition.set(neptune.radius * 3, PI / 2.1, PI * 0.5);
+      this.#camera.sunOrbitPosition.set(sun.radius * 3, PI / 2, 5 * PI / 4);
 
-      handleScroll();
+      this.handleScroll();
     }
-  }
+  };
 
-  function handleScroll() {
-    const currentOffset = window.pageYOffset;
+  handleAppResize = () => {
+    this.handleMediaChange();
 
-    camera.updateOnScroll(sections, currentOffset);
-  }
+    this.#camera.aspect = this.#domContainer.clientWidth / this.#domContainer.clientHeight;
+    this.#camera.updateProjectionMatrix();
 
-  function handleAppResize(domContainer, mediaQuery) {
-    handleMediaChange(mediaQuery);
-
-    camera.aspect = domContainer.clientWidth / domContainer.clientHeight;
-    camera.updateProjectionMatrix();
-
-    renderer.setSize(domContainer.clientWidth, domContainer.clientHeight);
-    renderer.render(scene, camera);
-  }
-
-  return { update, handleMouseMove, handleMediaChange, handleScroll, handleAppResize };
+    this.#renderer.setSize(this.#domContainer.clientWidth, this.#domContainer.clientHeight);
+    this.#renderer.render(this.#scene, this.#camera);
+  };
 }
