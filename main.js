@@ -1,4 +1,4 @@
-import createApp from "./modules/app.js";
+import App from "./modules/app.js";
 
 const mobileMediaQuery = window.matchMedia("(max-width: 1023px)");
 
@@ -65,14 +65,14 @@ if (!localStorage.getItem('orientationPermission')) {
 }
 
 if (appContainer && sections) {
-  app = createApp(appContainer, sections, mouse);
+  app = new App(appContainer, sections, mouse, mobileMediaQuery);
 
   window.addEventListener('mousemove', app.handleMouseMove);
-  window.addEventListener('scroll', app.handleScroll);
+  window.addEventListener('scroll', app.handleScroll.bind(app));
   if (orientationPermissionButton) orientationPermissionButton.addEventListener('click', handleOrientationPermission);
 
   const appResizeObserver = new ResizeObserver(entries => {
-    entries.forEach(entry => app.handleAppResize(entry.target, mobileMediaQuery));
+    entries.forEach(app.handleAppResize.bind(app));
   });
 
   appResizeObserver.observe(appContainer);
