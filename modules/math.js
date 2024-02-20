@@ -40,3 +40,38 @@ export function easeInOutCirc(x) {
 export function lerpFactor(x, dt) {
   return 1 - Math.pow(x, dt);
 }
+
+export function roundToTwoDecimals(number) {
+  return Math.round((number + Number.EPSILON) * 100) / 100;
+}
+
+export function calculateFrequency(array) {
+  const frequencyMap = {};
+  let maxFrequency = 0;
+  let mode = [];
+
+  array.forEach(number => {
+    frequencyMap[number] = (frequencyMap[number] || 0) + 1;
+
+    if (frequencyMap[number] > maxFrequency) {
+      maxFrequency = frequencyMap[number];
+      mode = [number];
+    } else if (frequencyMap[number] === maxFrequency && mode.indexOf(number) === -1) {
+      mode.push(number);
+    }
+  });
+
+  return { mode, frequencyMap };
+}
+
+export function getMedian(sortedArray) {
+  const { length } = sortedArray;
+  if (length % 2 === 0) return roundToTwoDecimals((sortedArray[length / 2 - 1] + sortedArray[length / 2]) / 2);
+  return roundToTwoDecimals(sortedArray[(length - 1) / 2]);
+}
+
+export function getStandardDeviation(array, mean) {
+  const squaredDifferences = array.map(number => Math.pow(number - mean, 2));
+  const averageSquaredDifference = squaredDifferences.reduce((sum, diff) => sum + diff, 0) / array.length;
+  return roundToTwoDecimals(Math.sqrt(averageSquaredDifference));
+}

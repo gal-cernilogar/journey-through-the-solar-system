@@ -1,39 +1,5 @@
 import * as THREE from 'three';
-
-function roundToTwoDecimals(number) {
-  return Math.round((number + Number.EPSILON) * 100) / 100;
-}
-
-function calculateFrequency(array) {
-  const frequencyMap = {};
-  let maxFrequency = 0;
-  let mode = [];
-
-  array.forEach(number => {
-    frequencyMap[number] = (frequencyMap[number] || 0) + 1;
-
-    if (frequencyMap[number] > maxFrequency) {
-      maxFrequency = frequencyMap[number];
-      mode = [number];
-    } else if (frequencyMap[number] === maxFrequency && mode.indexOf(number) === -1) {
-      mode.push(number);
-    }
-  });
-
-  return { mode, frequencyMap };
-}
-
-function getMedian(array) {
-  const { length } = array;
-  if (length % 2 === 0) return roundToTwoDecimals((array[length / 2 - 1] + array[length / 2]) / 2);
-  return roundToTwoDecimals(array[(length - 1) / 2]);
-}
-
-function getStandardDeviation(array, mean) {
-  const squaredDifferences = array.map(number => Math.pow(number - mean, 2));
-  const averageSquaredDifference = squaredDifferences.reduce((sum, diff) => sum + diff, 0) / array.length;
-  return roundToTwoDecimals(Math.sqrt(averageSquaredDifference));
-}
+import { roundToTwoDecimals, calculateFrequency, getMedian, getStandardDeviation } from './math';
 
 export default class Tester {
   isTesting = false;
