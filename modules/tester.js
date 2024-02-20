@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { roundToTwoDecimals, calculateFrequency, getMedian, getStandardDeviation } from './math';
 
 export default class Tester {
+
   isTesting = false;
   times = [];
   #mode = '';
@@ -45,13 +46,35 @@ export default class Tester {
     const median = getMedian(this.times);
     const { mode, frequencyMap } = calculateFrequency(this.times);
 
-    console.log(`Min: ${this.times[0]}`);
-    console.log(`Max: ${this.times[this.times.length - 1]}`);
-    console.log(`Mean: ${mean}`);
-    console.log(`Standard deviation: ${standardDeviation}`);
-    console.log(`Median: ${median}`);
-    console.log(`Mode: ${mode.toString()}`);
+    const data = {
+      min: this.times[0],
+      max: this.times[this.times.length - 1],
+      mean,
+      standardDeviation,
+      median,
+      mode,
+      frequencyMap
+    };
+
+    console.log(`Min: ${data.min}`);
+    console.log(`Max: ${data.max}`);
+    console.log(`Mean: ${data.mean}`);
+    console.log(`Standard deviation: ${data.standardDeviation}`);
+    console.log(`Median: ${data.median}`);
+    console.log(`Mode: ${data.mode.toString()}`);
     console.log('Frequency map:');
-    console.table(frequencyMap);
+    console.table(data.frequencyMap);
+
+    this.#download(data);
   }
+
+  #download(data) {
+    const a = document.createElement("a");
+    const content = JSON.stringify(data, null, 2);
+    const file = new Blob([content], { type: 'text/json' });
+    a.href = URL.createObjectURL(file);
+    a.download = `${this.#mode}-test-data.json`;
+    a.click();
+  }
+
 }
