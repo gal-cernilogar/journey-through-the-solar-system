@@ -38,22 +38,23 @@ export default class Tester {
     console.log(this.times);
 
     this.times.forEach((time, index) => this.times[index] = roundToTwoDecimals(time));
-    this.times.sort((a, b) => a - b);
+    const sortedTimes = [...this.times].sort((a, b) => a - b);
 
-    const sum = this.times.reduce((a, b) => a + b, 0);
-    const mean = roundToTwoDecimals(sum / this.times.length);
-    const standardDeviation = getStandardDeviation(this.times, mean);
-    const median = getMedian(this.times);
-    const { mode, frequencyMap } = calculateFrequency(this.times);
+    const sum = sortedTimes.reduce((a, b) => a + b, 0);
+    const mean = roundToTwoDecimals(sum / sortedTimes.length);
+    const standardDeviation = getStandardDeviation(sortedTimes, mean);
+    const median = getMedian(sortedTimes);
+    const { mode, frequencyMap } = calculateFrequency(sortedTimes);
 
     const data = {
-      min: this.times[0],
-      max: this.times[this.times.length - 1],
+      min: sortedTimes[0],
+      max: sortedTimes[sortedTimes.length - 1],
       mean,
       standardDeviation,
       median,
       mode,
-      frequencyMap
+      frequencyMap,
+      times: this.times
     };
 
     console.log(`Min: ${data.min}`);
