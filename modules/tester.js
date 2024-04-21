@@ -28,7 +28,7 @@ export default class Tester {
         behavior: 'instant'
       });
 
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) this.#endTesting();
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 10) this.#endTesting();
     }
   }
 
