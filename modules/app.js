@@ -24,7 +24,7 @@ export default class App {
     this.#mouse = mouse;
     this.#mediaQuery = mediaQuery;
 
-    this.#tester = new Tester(10000);
+    this.#tester = new Tester('passive', 10000);
     this.#clock = new THREE.Clock();
     this.#camera = new Camera(this.#domContainer);
     this.#scene = new Scene({ stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune });
@@ -50,7 +50,8 @@ export default class App {
     this.#camera.update(dt);
 
     this.#renderer.render(this.#scene, this.#camera);
-    if (this.#tester.isTesting) this.#tester.times.push(performance.now() - startTime);
+
+    if (this.#tester.isTesting) this.#tester.update(performance.now() - startTime);
   };
 
   handleMouseMove = (event) => {
@@ -58,9 +59,7 @@ export default class App {
   };
 
   handleScroll = () => {
-    const currentOffset = window.scrollY;
-
-    this.#camera.updateOnScroll(this.#sections, currentOffset);
+    this.#camera.updateOnScroll(this.#sections, window.scrollY);
   };
 
   handleMediaChange = () => {
