@@ -24,7 +24,7 @@ export default class App {
     this.#mouse = mouse;
     this.#mediaQuery = mediaQuery;
 
-    this.#tester = new Tester('passive', 10000);
+    this.#tester = new Tester('active', 10000);
     this.#clock = new THREE.Clock();
     this.#camera = new Camera(this.#domContainer);
     this.#scene = new Scene({ stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune });
