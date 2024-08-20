@@ -4,7 +4,6 @@ import Scene from './scene';
 import Renderer from './renderer';
 import { stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune } from '/modules/objects';
 import { PI } from "/modules/math.js";
-import Tester from './tester';
 
 export default class App {
   #domContainer;
@@ -16,7 +15,6 @@ export default class App {
   #scene;
   #renderer;
   #clock;
-  #tester;
 
   constructor(domContainer, sections, mouse, mediaQuery) {
     this.#domContainer = domContainer;
@@ -24,7 +22,6 @@ export default class App {
     this.#mouse = mouse;
     this.#mediaQuery = mediaQuery;
 
-    this.#tester = new Tester('active', 10000);
     this.#clock = new THREE.Clock();
     this.#camera = new Camera(this.#domContainer);
     this.#scene = new Scene({ stars, sun, mercury, venus, earth, moon, mars, jupiter, saturn, uranus, neptune });
@@ -32,7 +29,6 @@ export default class App {
   }
 
   update = () => {
-    const startTime = performance.now();
     const dt = this.#clock.getDelta();
 
     stars.update(dt, this.#camera.position);
@@ -50,8 +46,6 @@ export default class App {
     this.#camera.update(dt);
 
     this.#renderer.render(this.#scene, this.#camera);
-
-    if (this.#tester.isTesting) this.#tester.update(performance.now() - startTime);
   };
 
   handleMouseMove = (event) => {
